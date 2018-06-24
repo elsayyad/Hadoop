@@ -1,0 +1,1243 @@
+## Installed Componennts ##
+---------------------
+0	Ubuntu OS VM
+1 	Java JDK
+2	SSH
+3	Hadoop
+4	MongoDB
+5	SQOOP
+6 	SPARK
+7 	PIP
+8 	NumPy
+9 	MYSQL
+10	HIVE
+11 	Zoo Keepr / KAFKA
+---------------------
+============================================================================
+## Hadoop Installation on Ubuntu ##
+0) Update /etc/resolv.conf
+In order to download the ssh package from repo.
+============================================================================
+## Installing Java ##
+
+1) Download Java 
+root@cai-hadoop01:/downloads# wget --no-cookies \
+> --no-check-certificate \
+> --header "Cookie: oraclelicense=accept-securebackup-cookie" \
+> "http://download.oracle.com/otn-pub/java/jdk/7u55-b13/jdk-7u55-linux-x64.tar.gz" \
+> -O jdk-7-linux-x64.tar.gz
+--2016-10-12 12:04:46--  http://download.oracle.com/otn-pub/java/jdk/7u55-b13/jdk-7u55-linux-x64.tar.gz
+Resolving download.oracle.com (download.oracle.com)... 65.202.184.114, 65.202.184.99
+Connecting to download.oracle.com (download.oracle.com)|65.202.184.114|:80... connected.
+HTTP request sent, awaiting response... 302 Found
+Location: https://edelivery.oracle.com/otn-pub/java/jdk/7u55-b13/jdk-7u55-linux-x64.tar.gz [following]
+--2016-10-12 12:04:51--  https://edelivery.oracle.com/otn-pub/java/jdk/7u55-b13/jdk-7u55-linux-x64.tar.gz
+Resolving edelivery.oracle.com (edelivery.oracle.com)... 23.76.212.169, 2600:807:320:202:9300::2d3e, 2600:807:320:202:8100::2d3e
+Connecting to edelivery.oracle.com (edelivery.oracle.com)|23.76.212.169|:443... connected.
+HTTP request sent, awaiting response... 302 Moved Temporarily
+Location: http://download.oracle.com/otn-pub/java/jdk/7u55-b13/jdk-7u55-linux-x64.tar.gz?AuthParam=1476283945_b3f8598b7e1a4087b29b44e0f04a87b0 [following]
+--2016-10-12 12:04:58--  http://download.oracle.com/otn-pub/java/jdk/7u55-b13/jdk-7u55-linux-x64.tar.gz?AuthParam=1476283945_b3f8598b7e1a4087b29b44e0f04a87b0
+Connecting to download.oracle.com (download.oracle.com)|65.202.184.114|:80... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 138220064 (132M) [application/x-gzip]
+Saving to: ‘jdk-7-linux-x64.tar.gz’
+
+jdk-7-linux-x64.tar.gz                  100%[============================================================================>] 131.82M   667KB/s    in 3m 22s
+
+2016-10-12 12:08:21 (670 KB/s) - ‘jdk-7-linux-x64.tar.gz’ saved [138220064/138220064]
+
+root@cai-hadoop01:/downloads# ls -l
+total 134984
+-rw-r--r-- 1 root root 138220064 Apr 22  2014 jdk-7-linux-x64.tar.gz
+root@cai-hadoop01:/downloads# file jdk-7-linux-x64.tar.gz
+jdk-7-linux-x64.tar.gz: gzip compressed data, last modified: Tue Mar 18 03:04:00 2014, from Unix
+root@cai-hadoop01:/downloads# tar -xvzf jdk-7-linux-x64.tar.gz
+
+2) Create Dir and Move Java to it
+
+root@cai-hadoop01:/downloads# sudo mkdir -p /usr/lib/jvm/jdk1.7.0
+root@cai-hadoop01:/downloads# sudo mv jdk1.7.0_55/* /usr/lib/jvm/jdk1.7.0/
+
+3)
+root@cai-hadoop01:/downloads# sudo update-alternatives --install "/usr/bin/java" "java" "/usr/lib/jvm/jdk1.7.0/bin/java" 1
+root@cai-hadoop01:/downloads# sudo update-alternatives --install "/usr/bin/javac" "javac" "/usr/lib/jvm/jdk1.7.0/bin/javac" 1
+root@cai-hadoop01:/downloads#  sudo update-alternatives --install "/usr/bin/javaws" "javaws" "/usr/lib/jvm/jdk1.7.0/bin/javaws" 1
+root@cai-hadoop01:/downloads# javac -version
+javac 1.7.0_55
+============================================================================
+## SSH ##
+root@cai-hadoop01:~#  sudo addgroup hadoop
+Adding group hadoop (GID 1000) ...
+Done.
+root@cai-hadoop01:~# sudo adduser --ingroup hadoop hduser
+
+root@cai-hadoop01:~$ sudo apt-get install openssh-server
+
+root@cai-hadoop01:~$ su - hduser
+
+hduser@cai-hadoop01:~$ ssh-keygen -t rsa -P ""
+Generating public/private rsa key pair.
+Enter file in which to save the key (/home/hduser/.ssh/id_rsa):
+Created directory '/home/hduser/.ssh'.
+Your identification has been saved in /home/hduser/.ssh/id_rsa.
+Your public key has been saved in /home/hduser/.ssh/id_rsa.pub.
+The key fingerprint is:
+SHA256:2KbhB8j01eFSt5DfUGG9ly4ofIpPoNAQXJmlOeB02JA hduser@cai-hadoop01
+The keys randomart image is:
++---[RSA 2048]----+
+|  .=*o+.  +...+o |
+|  oE++o  +.+.o  .|
+|   o.+  o o..o  o|
+|   ooo.+ .  . .o.|
+|   .o.=.S   . . .|
+|    ...=.o o . . |
+|     .o o.+   .  |
+|       o..       |
+|        ..       |
++----[SHA256]-----+
+hduser@cai-hadoop01:~$
+
+hduser@cai-hadoop01:~$ cat $HOME/.ssh/id_rsa.pub >> $HOME/.ssh/authorized_keys
+hduser@cai-hadoop01:~$
+
+============================================================================
+export JAVA_HOME=/usr/lib/jvm/jdk1.7.0
+============================================================================
+## Download Hadoop ##
+wget http://www-eu.apache.org/dist/hadoop/common/hadoop-2.7.3/hadoop-2.7.3.tar.gz
+
+tar -xvzf /downloads/hadoop-2.7.3.tar.gz
+============================================================================
+## Installing Hadoop ##
+root@cai-hadoop01:/downloads# mv hadoop-2.7.3 /usr/local/hadoop-2.7.3
+root@cai-hadoop01:/downloads# cd /usr/local
+root@cai-hadoop01:/usr/local# ln -s hadoop-2.7.3 hadoop
+root@cai-hadoop01:/usr/local# chown -R hduser:hadoop hadoop
+root@cai-hadoop01:/usr/local# ls -l
+total 36
+drwxr-xr-x 2 root   root   4096 Jul 19 15:43 bin
+drwxr-xr-x 2 root   root   4096 Jul 19 15:43 etc
+drwxr-xr-x 2 root   root   4096 Jul 19 15:43 games
+lrwxrwxrwx 1 hduser hadoop   12 Oct 12 14:13 hadoop -> hadoop-2.7.3
+drwxr-xr-x 9 root   root   4096 Aug 17 20:49 hadoop-2.7.3
+drwxr-xr-x 2 root   root   4096 Jul 19 15:43 include
+drwxr-xr-x 3 root   root   4096 Oct 12 10:49 lib
+lrwxrwxrwx 1 root   root      9 Oct 12 10:49 man -> share/man
+drwxr-xr-x 2 root   root   4096 Jul 19 15:43 sbin
+drwxr-xr-x 6 root   root   4096 Oct 12 11:02 share
+drwxr-xr-x 2 root   root   4096 Jul 19 15:43 src
+root@cai-hadoop01:/usr/local#
+
+
+## Change Java Home in Conf. File ##
+root@cai-hadoop01:/usr/local/hadoop/etc/hadoop# grep JAVA_HOME hadoop-env.sh
+# The only required environment variable is JAVA_HOME.  All others are
+# set JAVA_HOME in this file, so that it is correctly defined on
+export JAVA_HOME=/usr/lib/jvm/jdk1.7.0
+root@cai-hadoop01:/usr/local/hadoop/etc/hadoop#
+
+============================================================================
+
+## Configure Hadoop ##
+root@cai-hadoop01:/usr/local/hadoop/etc/hadoop# sudo mkdir -p /opt/hadoop/tmp
+root@cai-hadoop01:/usr/local/hadoop/etc/hadoop# sudo chown hduser:hadoop /opt/hadoop/tmp
+root@cai-hadoop01:/usr/local/hadoop/etc/hadoop# chmod 750 /opt/hadoop/tmp
+root@cai-hadoop01:/usr/local/hadoop/etc/hadoop#
+
+
+1) ==> This directory should be specified as value for the hadoop.tmp.dir property in file /usr/local/hadoop/conf/core-site.xml. Note that this file will likely contain only an empty configuration tag, within which a property tag should be nested:
+
+
+root@cai-hadoop01:/usr/local/hadoop/etc/hadoop# cat core-site.xml
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+<!--
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License. See accompanying LICENSE file.
+-->
+
+<!-- Put site-specific property overrides in this file. -->
+<configuration>
+  <property>
+    <name>hadoop.tmp.dir</name>
+    <value>/opt/hadoop/tmp</value>
+    <description>A base for other temporary directories</description>
+  </property>
+  <property>
+    <name>fs.default.name</name>
+    <value>hdfs://localhost:54310</value>
+    <description>The name of the default file system. A URI whose scheme and
+    authority determine the FileSystem implementation. The URI's scheme
+    determines the config property (fs.SCHEME.impl) naming the FileSystem
+    implementation class. The URI's authority is used to determione the host,
+    port, etc. for a file system.</description>
+  </property>
+</configuration>
+root@cai-hadoop01:/usr/local/hadoop/etc/hadoop#
+
+2) ==> The configuration process also requires to add a mapred.job.tracker property in /usr/local/hadoop/conf/mapred-site.xml
+root@cai-hadoop01:/usr/local/hadoop/etc/hadoop# cp mapred-site.xml.template mapred-site.xml
+
+
+root@cai-hadoop01:/usr/local/hadoop/etc/hadoop# cat mapred-site.xml
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+<!--
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License. See accompanying LICENSE file.
+-->
+
+<!-- Put site-specific property overrides in this file. -->
+<configuration>
+  <property>
+    <name>mapred.job.tracker</name>
+    <value>localhost:54311</value>
+    <description>The host and port that the MapReduce job tracker runs at. If
+    "local", then jobs are run in-process as a single map and reduce tasks.
+    </description>
+  </property>
+</configuration>
+
+root@cai-hadoop01:/usr/local/hadoop/etc/hadoop#
+
+
+3) and a dfs.replication property in /usr/local/hadoop/conf/hdfs-site.xml
+
+
+
+root@cai-hadoop01:/usr/local/hadoop/etc/hadoop# vi hdfs-site.xml
+root@cai-hadoop01:/usr/local/hadoop/etc/hadoop# cat hdfs-site.xml
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+<!--
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License. See accompanying LICENSE file.
+-->
+
+<!-- Put site-specific property overrides in this file. -->
+
+<configuration>
+<property>
+    <name>dfs.replication</name>
+    <value>1</value>
+    <description>Default block replication. The actual number of replications
+    can be specified when the file is created. The default is used if
+    replication is not specified in create time.</description>
+  </property>
+</configuration>
+root@cai-hadoop01:/usr/local/hadoop/etc/hadoop#
+
+============================================================================
+## Formatting the distributed file system ##
+
+The last step consists in formatting the file system, operation to be executed as hduser:
+
+hduser@cai-hadoop01:~$ /usr/local/hadoop/bin/hadoop namenode -format
+DEPRECATED: Use of this script to execute hdfs command is deprecated.
+Instead use the hdfs command for it.
+
+16/10/12 14:30:28 INFO namenode.NameNode: STARTUP_MSG:
+/************************************************************
+STARTUP_MSG: Starting NameNode
+STARTUP_MSG:   host = cai-hadoop01.emc.com/10.77.84.164
+STARTUP_MSG:   args = [-format]
+STARTUP_MSG:   version = 2.7.3
+STARTUP_MSG:   classpath = /usr/local/hadoop/etc/hadoop:/usr/local/hadoop/share/hadoop/common/lib/api-asn1-api-1.0.0-M20.jar:/usr/local/hadoop/share/hadoop/common/lib/commons-configuration-1.6.jar:/usr/local/hadoop/share/hadoop/common/lib/paranamer-2.3.jar:/usr/local/hadoop/share/hadoop/common/lib/commons-beanutils-1.7.0.jar:/usr/local/hadoop/share/hadoop/common/lib/jsr305-3.0.0.jar:/usr/local/hadoop/share/hadoop/common/lib/commons-compress-1.4.1.jar:/usr/local/hadoop/share/hadoop/common/lib/commons-math3-3.1.1.jar:/usr/local/hadoop/share/hadoop/common/lib/jersey-json-1.9.jar:/usr/local/hadoop/share/hadoop/common/lib/stax-api-1.0-2.jar:/usr/local/hadoop/share/hadoop/common/lib/commons-httpclient-3.1.jar:/usr/local/hadoop/share/hadoop/common/lib/commons-io-2.4.jar:/usr/local/hadoop/share/hadoop/common/lib/commons-beanutils-core-1.8.0.jar:/usr/local/hadoop/share/hadoop/common/lib/commons-net-3.1.jar:/usr/local/hadoop/share/hadoop/common/lib/commons-digester-1.8.jar:/usr/local/hadoop/share/hadoop/common/lib/curator-framework-2.7.1.jar:/usr/local/hadoop/share/hadoop/common/lib/curator-client-2.7.1.jar:/usr/local/hadoop/share/hadoop/common/lib/jetty-util-6.1.26.jar:/usr/local/hadoop/share/hadoop/common/lib/jersey-server-1.9.jar:/usr/local/hadoop/share/hadoop/common/lib/activation-1.1.jar:/usr/local/hadoop/share/hadoop/common/lib/gson-2.2.4.jar:/usr/local/hadoop/share/hadoop/common/lib/commons-logging-1.1.3.jar:/usr/local/hadoop/share/hadoop/common/lib/servlet-api-2.5.jar:/usr/local/hadoop/share/hadoop/common/lib/jaxb-impl-2.2.3-1.jar:/usr/local/hadoop/share/hadoop/common/lib/curator-recipes-2.7.1.jar:/usr/local/hadoop/share/hadoop/common/lib/xmlenc-0.52.jar:/usr/local/hadoop/share/hadoop/common/lib/mockito-all-1.8.5.jar:/usr/local/hadoop/share/hadoop/common/lib/apacheds-kerberos-codec-2.0.0-M15.jar:/usr/local/hadoop/share/hadoop/common/lib/slf4j-api-1.7.10.jar:/usr/local/hadoop/share/hadoop/common/lib/zookeeper-3.4.6.jar:/usr/local/hadoop/share/hadoop/common/lib/netty-3.6.2.Final.jar:/usr/local/hadoop/share/hadoop/common/lib/hamcrest-core-1.3.jar:/usr/local/hadoop/share/hadoop/common/lib/jetty-6.1.26.jar:/usr/local/hadoop/share/hadoop/common/lib/hadoop-annotations-2.7.3.jar:/usr/local/hadoop/share/hadoop/common/lib/commons-collections-3.2.2.jar:/usr/local/hadoop/share/hadoop/common/lib/slf4j-log4j12-1.7.10.jar:/usr/local/hadoop/share/hadoop/common/lib/httpclient-4.2.5.jar:/usr/local/hadoop/share/hadoop/common/lib/jettison-1.1.jar:/usr/local/hadoop/share/hadoop/common/lib/commons-cli-1.2.jar:/usr/local/hadoop/share/hadoop/common/lib/jackson-mapper-asl-1.9.13.jar:/usr/local/hadoop/share/hadoop/common/lib/junit-4.11.jar:/usr/local/hadoop/share/hadoop/common/lib/protobuf-java-2.5.0.jar:/usr/local/hadoop/share/hadoop/common/lib/jackson-xc-1.9.13.jar:/usr/local/hadoop/share/hadoop/common/lib/api-util-1.0.0-M20.jar:/usr/local/hadoop/share/hadoop/common/lib/htrace-core-3.1.0-incubating.jar:/usr/local/hadoop/share/hadoop/common/lib/xz-1.0.jar:/usr/local/hadoop/share/hadoop/common/lib/jaxb-api-2.2.2.jar:/usr/local/hadoop/share/hadoop/common/lib/apacheds-i18n-2.0.0-M15.jar:/usr/local/hadoop/share/hadoop/common/lib/snappy-java-1.0.4.1.jar:/usr/local/hadoop/share/hadoop/common/lib/httpcore-4.2.5.jar:/usr/local/hadoop/share/hadoop/common/lib/jackson-core-asl-1.9.13.jar:/usr/local/hadoop/share/hadoop/common/lib/commons-lang-2.6.jar:/usr/local/hadoop/share/hadoop/common/lib/java-xmlbuilder-0.4.jar:/usr/local/hadoop/share/hadoop/common/lib/jersey-core-1.9.jar:/usr/local/hadoop/share/hadoop/common/lib/asm-3.2.jar:/usr/local/hadoop/share/hadoop/common/lib/commons-codec-1.4.jar:/usr/local/hadoop/share/hadoop/common/lib/jsch-0.1.42.jar:/usr/local/hadoop/share/hadoop/common/lib/jackson-jaxrs-1.9.13.jar:/usr/local/hadoop/share/hadoop/common/lib/hadoop-auth-2.7.3.jar:/usr/local/hadoop/share/hadoop/common/lib/log4j-1.2.17.jar:/usr/local/hadoop/share/hadoop/common/lib/guava-11.0.2.jar:/usr/local/hadoop/share/hadoop/common/lib/jets3t-0.9.0.jar:/usr/local/hadoop/share/hadoop/common/lib/jsp-api-2.1.jar:/usr/local/hadoop/share/hadoop/common/lib/avro-1.7.4.jar:/usr/local/hadoop/share/hadoop/common/hadoop-common-2.7.3.jar:/usr/local/hadoop/share/hadoop/common/hadoop-nfs-2.7.3.jar:/usr/local/hadoop/share/hadoop/common/hadoop-common-2.7.3-tests.jar:/usr/local/hadoop/share/hadoop/hdfs:/usr/local/hadoop/share/hadoop/hdfs/lib/jsr305-3.0.0.jar:/usr/local/hadoop/share/hadoop/hdfs/lib/leveldbjni-all-1.8.jar:/usr/local/hadoop/share/hadoop/hdfs/lib/commons-io-2.4.jar:/usr/local/hadoop/share/hadoop/hdfs/lib/jetty-util-6.1.26.jar:/usr/local/hadoop/share/hadoop/hdfs/lib/xercesImpl-2.9.1.jar:/usr/local/hadoop/share/hadoop/hdfs/lib/netty-all-4.0.23.Final.jar:/usr/local/hadoop/share/hadoop/hdfs/lib/jersey-server-1.9.jar:/usr/local/hadoop/share/hadoop/hdfs/lib/commons-logging-1.1.3.jar:/usr/local/hadoop/share/hadoop/hdfs/lib/servlet-api-2.5.jar:/usr/local/hadoop/share/hadoop/hdfs/lib/xmlenc-0.52.jar:/usr/local/hadoop/share/hadoop/hdfs/lib/netty-3.6.2.Final.jar:/usr/local/hadoop/share/hadoop/hdfs/lib/jetty-6.1.26.jar:/usr/local/hadoop/share/hadoop/hdfs/lib/commons-cli-1.2.jar:/usr/local/hadoop/share/hadoop/hdfs/lib/jackson-mapper-asl-1.9.13.jar:/usr/local/hadoop/share/hadoop/hdfs/lib/protobuf-java-2.5.0.jar:/usr/local/hadoop/share/hadoop/hdfs/lib/htrace-core-3.1.0-incubating.jar:/usr/local/hadoop/share/hadoop/hdfs/lib/commons-daemon-1.0.13.jar:/usr/local/hadoop/share/hadoop/hdfs/lib/jackson-core-asl-1.9.13.jar:/usr/local/hadoop/share/hadoop/hdfs/lib/commons-lang-2.6.jar:/usr/local/hadoop/share/hadoop/hdfs/lib/jersey-core-1.9.jar:/usr/local/hadoop/share/hadoop/hdfs/lib/asm-3.2.jar:/usr/local/hadoop/share/hadoop/hdfs/lib/commons-codec-1.4.jar:/usr/local/hadoop/share/hadoop/hdfs/lib/log4j-1.2.17.jar:/usr/local/hadoop/share/hadoop/hdfs/lib/guava-11.0.2.jar:/usr/local/hadoop/share/hadoop/hdfs/lib/xml-apis-1.3.04.jar:/usr/local/hadoop/share/hadoop/hdfs/hadoop-hdfs-2.7.3-tests.jar:/usr/local/hadoop/share/hadoop/hdfs/hadoop-hdfs-2.7.3.jar:/usr/local/hadoop/share/hadoop/hdfs/hadoop-hdfs-nfs-2.7.3.jar:/usr/local/hadoop/share/hadoop/yarn/lib/jsr305-3.0.0.jar:/usr/local/hadoop/share/hadoop/yarn/lib/leveldbjni-all-1.8.jar:/usr/local/hadoop/share/hadoop/yarn/lib/commons-compress-1.4.1.jar:/usr/local/hadoop/share/hadoop/yarn/lib/jersey-json-1.9.jar:/usr/local/hadoop/share/hadoop/yarn/lib/stax-api-1.0-2.jar:/usr/local/hadoop/share/hadoop/yarn/lib/commons-io-2.4.jar:/usr/local/hadoop/share/hadoop/yarn/lib/jetty-util-6.1.26.jar:/usr/local/hadoop/share/hadoop/yarn/lib/jersey-server-1.9.jar:/usr/local/hadoop/share/hadoop/yarn/lib/activation-1.1.jar:/usr/local/hadoop/share/hadoop/yarn/lib/commons-logging-1.1.3.jar:/usr/local/hadoop/share/hadoop/yarn/lib/servlet-api-2.5.jar:/usr/local/hadoop/share/hadoop/yarn/lib/jaxb-impl-2.2.3-1.jar:/usr/local/hadoop/share/hadoop/yarn/lib/guice-3.0.jar:/usr/local/hadoop/share/hadoop/yarn/lib/guice-servlet-3.0.jar:/usr/local/hadoop/share/hadoop/yarn/lib/zookeeper-3.4.6.jar:/usr/local/hadoop/share/hadoop/yarn/lib/netty-3.6.2.Final.jar:/usr/local/hadoop/share/hadoop/yarn/lib/jetty-6.1.26.jar:/usr/local/hadoop/share/hadoop/yarn/lib/commons-collections-3.2.2.jar:/usr/local/hadoop/share/hadoop/yarn/lib/aopalliance-1.0.jar:/usr/local/hadoop/share/hadoop/yarn/lib/jettison-1.1.jar:/usr/local/hadoop/share/hadoop/yarn/lib/commons-cli-1.2.jar:/usr/local/hadoop/share/hadoop/yarn/lib/jackson-mapper-asl-1.9.13.jar:/usr/local/hadoop/share/hadoop/yarn/lib/jersey-client-1.9.jar:/usr/local/hadoop/share/hadoop/yarn/lib/protobuf-java-2.5.0.jar:/usr/local/hadoop/share/hadoop/yarn/lib/jackson-xc-1.9.13.jar:/usr/local/hadoop/share/hadoop/yarn/lib/javax.inject-1.jar:/usr/local/hadoop/share/hadoop/yarn/lib/zookeeper-3.4.6-tests.jar:/usr/local/hadoop/share/hadoop/yarn/lib/xz-1.0.jar:/usr/local/hadoop/share/hadoop/yarn/lib/jaxb-api-2.2.2.jar:/usr/local/hadoop/share/hadoop/yarn/lib/jackson-core-asl-1.9.13.jar:/usr/local/hadoop/share/hadoop/yarn/lib/commons-lang-2.6.jar:/usr/local/hadoop/share/hadoop/yarn/lib/jersey-core-1.9.jar:/usr/local/hadoop/share/hadoop/yarn/lib/asm-3.2.jar:/usr/local/hadoop/share/hadoop/yarn/lib/commons-codec-1.4.jar:/usr/local/hadoop/share/hadoop/yarn/lib/jackson-jaxrs-1.9.13.jar:/usr/local/hadoop/share/hadoop/yarn/lib/log4j-1.2.17.jar:/usr/local/hadoop/share/hadoop/yarn/lib/guava-11.0.2.jar:/usr/local/hadoop/share/hadoop/yarn/lib/jersey-guice-1.9.jar:/usr/local/hadoop/share/hadoop/yarn/hadoop-yarn-client-2.7.3.jar:/usr/local/hadoop/share/hadoop/yarn/hadoop-yarn-applications-unmanaged-am-launcher-2.7.3.jar:/usr/local/hadoop/share/hadoop/yarn/hadoop-yarn-server-resourcemanager-2.7.3.jar:/usr/local/hadoop/share/hadoop/yarn/hadoop-yarn-server-tests-2.7.3.jar:/usr/local/hadoop/share/hadoop/yarn/hadoop-yarn-server-nodemanager-2.7.3.jar:/usr/local/hadoop/share/hadoop/yarn/hadoop-yarn-server-web-proxy-2.7.3.jar:/usr/local/hadoop/share/hadoop/yarn/hadoop-yarn-registry-2.7.3.jar:/usr/local/hadoop/share/hadoop/yarn/hadoop-yarn-server-applicationhistoryservice-2.7.3.jar:/usr/local/hadoop/share/hadoop/yarn/hadoop-yarn-server-sharedcachemanager-2.7.3.jar:/usr/local/hadoop/share/hadoop/yarn/hadoop-yarn-applications-distributedshell-2.7.3.jar:/usr/local/hadoop/share/hadoop/yarn/hadoop-yarn-server-common-2.7.3.jar:/usr/local/hadoop/share/hadoop/yarn/hadoop-yarn-api-2.7.3.jar:/usr/local/hadoop/share/hadoop/yarn/hadoop-yarn-common-2.7.3.jar:/usr/local/hadoop/share/hadoop/mapreduce/lib/paranamer-2.3.jar:/usr/local/hadoop/share/hadoop/mapreduce/lib/leveldbjni-all-1.8.jar:/usr/local/hadoop/share/hadoop/mapreduce/lib/commons-compress-1.4.1.jar:/usr/local/hadoop/share/hadoop/mapreduce/lib/commons-io-2.4.jar:/usr/local/hadoop/share/hadoop/mapreduce/lib/jersey-server-1.9.jar:/usr/local/hadoop/share/hadoop/mapreduce/lib/guice-3.0.jar:/usr/local/hadoop/share/hadoop/mapreduce/lib/guice-servlet-3.0.jar:/usr/local/hadoop/share/hadoop/mapreduce/lib/netty-3.6.2.Final.jar:/usr/local/hadoop/share/hadoop/mapreduce/lib/hamcrest-core-1.3.jar:/usr/local/hadoop/share/hadoop/mapreduce/lib/hadoop-annotations-2.7.3.jar:/usr/local/hadoop/share/hadoop/mapreduce/lib/aopalliance-1.0.jar:/usr/local/hadoop/share/hadoop/mapreduce/lib/jackson-mapper-asl-1.9.13.jar:/usr/local/hadoop/share/hadoop/mapreduce/lib/junit-4.11.jar:/usr/local/hadoop/share/hadoop/mapreduce/lib/protobuf-java-2.5.0.jar:/usr/local/hadoop/share/hadoop/mapreduce/lib/javax.inject-1.jar:/usr/local/hadoop/share/hadoop/mapreduce/lib/xz-1.0.jar:/usr/local/hadoop/share/hadoop/mapreduce/lib/snappy-java-1.0.4.1.jar:/usr/local/hadoop/share/hadoop/mapreduce/lib/jackson-core-asl-1.9.13.jar:/usr/local/hadoop/share/hadoop/mapreduce/lib/jersey-core-1.9.jar:/usr/local/hadoop/share/hadoop/mapreduce/lib/asm-3.2.jar:/usr/local/hadoop/share/hadoop/mapreduce/lib/log4j-1.2.17.jar:/usr/local/hadoop/share/hadoop/mapreduce/lib/jersey-guice-1.9.jar:/usr/local/hadoop/share/hadoop/mapreduce/lib/avro-1.7.4.jar:/usr/local/hadoop/share/hadoop/mapreduce/hadoop-mapreduce-examples-2.7.3.jar:/usr/local/hadoop/share/hadoop/mapreduce/hadoop-mapreduce-client-hs-plugins-2.7.3.jar:/usr/local/hadoop/share/hadoop/mapreduce/hadoop-mapreduce-client-jobclient-2.7.3.jar:/usr/local/hadoop/share/hadoop/mapreduce/hadoop-mapreduce-client-core-2.7.3.jar:/usr/local/hadoop/share/hadoop/mapreduce/hadoop-mapreduce-client-jobclient-2.7.3-tests.jar:/usr/local/hadoop/share/hadoop/mapreduce/hadoop-mapreduce-client-hs-2.7.3.jar:/usr/local/hadoop/share/hadoop/mapreduce/hadoop-mapreduce-client-shuffle-2.7.3.jar:/usr/local/hadoop/share/hadoop/mapreduce/hadoop-mapreduce-client-common-2.7.3.jar:/usr/local/hadoop/share/hadoop/mapreduce/hadoop-mapreduce-client-app-2.7.3.jar:/contrib/capacity-scheduler/*.jar:/contrib/capacity-scheduler/*.jar
+STARTUP_MSG:   build = https://git-wip-us.apache.org/repos/asf/hadoop.git -r baa91f7c6bc9cb92be5982de4719c1c8af91ccff; compiled by 'root' on 2016-08-18T01:41Z
+STARTUP_MSG:   java = 1.7.0_55
+************************************************************/
+16/10/12 14:30:28 INFO namenode.NameNode: registered UNIX signal handlers for [TERM, HUP, INT]
+16/10/12 14:30:28 INFO namenode.NameNode: createNameNode [-format]
+Formatting using clusterid: CID-148baad2-521a-4917-8534-0f39ffd35415
+16/10/12 14:30:30 INFO namenode.FSNamesystem: No KeyProvider found.
+16/10/12 14:30:30 INFO namenode.FSNamesystem: fsLock is fair:true
+16/10/12 14:30:31 INFO blockmanagement.DatanodeManager: dfs.block.invalidate.limit=1000
+16/10/12 14:30:31 INFO blockmanagement.DatanodeManager: dfs.namenode.datanode.registration.ip-hostname-check=true
+16/10/12 14:30:31 INFO blockmanagement.BlockManager: dfs.namenode.startup.delay.block.deletion.sec is set to 000:00:00:00.000
+16/10/12 14:30:31 INFO blockmanagement.BlockManager: The block deletion will start around 2016 Oct 12 14:30:31
+16/10/12 14:30:31 INFO util.GSet: Computing capacity for map BlocksMap
+16/10/12 14:30:31 INFO util.GSet: VM type       = 64-bit
+16/10/12 14:30:31 INFO util.GSet: 2.0% max memory 966.7 MB = 19.3 MB
+16/10/12 14:30:31 INFO util.GSet: capacity      = 2^21 = 2097152 entries
+16/10/12 14:30:31 INFO blockmanagement.BlockManager: dfs.block.access.token.enable=false
+16/10/12 14:30:31 INFO blockmanagement.BlockManager: defaultReplication         = 1
+16/10/12 14:30:31 INFO blockmanagement.BlockManager: maxReplication             = 512
+16/10/12 14:30:31 INFO blockmanagement.BlockManager: minReplication             = 1
+16/10/12 14:30:31 INFO blockmanagement.BlockManager: maxReplicationStreams      = 2
+16/10/12 14:30:31 INFO blockmanagement.BlockManager: replicationRecheckInterval = 3000
+16/10/12 14:30:31 INFO blockmanagement.BlockManager: encryptDataTransfer        = false
+16/10/12 14:30:31 INFO blockmanagement.BlockManager: maxNumBlocksToLog          = 1000
+16/10/12 14:30:31 INFO namenode.FSNamesystem: fsOwner             = hduser (auth:SIMPLE)
+16/10/12 14:30:31 INFO namenode.FSNamesystem: supergroup          = supergroup
+16/10/12 14:30:31 INFO namenode.FSNamesystem: isPermissionEnabled = true
+16/10/12 14:30:31 INFO namenode.FSNamesystem: HA Enabled: false
+16/10/12 14:30:31 INFO namenode.FSNamesystem: Append Enabled: true
+16/10/12 14:30:31 INFO util.GSet: Computing capacity for map INodeMap
+16/10/12 14:30:31 INFO util.GSet: VM type       = 64-bit
+16/10/12 14:30:31 INFO util.GSet: 1.0% max memory 966.7 MB = 9.7 MB
+16/10/12 14:30:31 INFO util.GSet: capacity      = 2^20 = 1048576 entries
+16/10/12 14:30:31 INFO namenode.FSDirectory: ACLs enabled? false
+16/10/12 14:30:31 INFO namenode.FSDirectory: XAttrs enabled? true
+16/10/12 14:30:31 INFO namenode.FSDirectory: Maximum size of an xattr: 16384
+16/10/12 14:30:31 INFO namenode.NameNode: Caching file names occuring more than 10 times
+16/10/12 14:30:31 INFO util.GSet: Computing capacity for map cachedBlocks
+16/10/12 14:30:31 INFO util.GSet: VM type       = 64-bit
+16/10/12 14:30:31 INFO util.GSet: 0.25% max memory 966.7 MB = 2.4 MB
+16/10/12 14:30:31 INFO util.GSet: capacity      = 2^18 = 262144 entries
+16/10/12 14:30:31 INFO namenode.FSNamesystem: dfs.namenode.safemode.threshold-pct = 0.9990000128746033
+16/10/12 14:30:31 INFO namenode.FSNamesystem: dfs.namenode.safemode.min.datanodes = 0
+16/10/12 14:30:31 INFO namenode.FSNamesystem: dfs.namenode.safemode.extension     = 30000
+16/10/12 14:30:31 INFO metrics.TopMetrics: NNTop conf: dfs.namenode.top.window.num.buckets = 10
+16/10/12 14:30:31 INFO metrics.TopMetrics: NNTop conf: dfs.namenode.top.num.users = 10
+16/10/12 14:30:31 INFO metrics.TopMetrics: NNTop conf: dfs.namenode.top.windows.minutes = 1,5,25
+16/10/12 14:30:31 INFO namenode.FSNamesystem: Retry cache on namenode is enabled
+16/10/12 14:30:31 INFO namenode.FSNamesystem: Retry cache will use 0.03 of total heap and retry cache entry expiry time is 600000 millis
+16/10/12 14:30:31 INFO util.GSet: Computing capacity for map NameNodeRetryCache
+16/10/12 14:30:31 INFO util.GSet: VM type       = 64-bit
+16/10/12 14:30:31 INFO util.GSet: 0.029999999329447746% max memory 966.7 MB = 297.0 KB
+16/10/12 14:30:31 INFO util.GSet: capacity      = 2^15 = 32768 entries
+16/10/12 14:30:31 INFO namenode.FSImage: Allocated new BlockPoolId: BP-1704301152-10.77.84.164-1476300631482
+16/10/12 14:30:31 INFO common.Storage: Storage directory /opt/hadoop/tmp/dfs/name has been successfully formatted.
+16/10/12 14:30:31 INFO namenode.FSImageFormatProtobuf: Saving image file /opt/hadoop/tmp/dfs/name/current/fsimage.ckpt_0000000000000000000 using no compression
+16/10/12 14:30:31 INFO namenode.FSImageFormatProtobuf: Image file /opt/hadoop/tmp/dfs/name/current/fsimage.ckpt_0000000000000000000 of size 353 bytes saved in 0 seconds.
+16/10/12 14:30:31 INFO namenode.NNStorageRetentionManager: Going to retain 1 images with txid >= 0
+16/10/12 14:30:31 INFO util.ExitUtil: Exiting with status 0
+16/10/12 14:30:31 INFO namenode.NameNode: SHUTDOWN_MSG:
+/************************************************************
+SHUTDOWN_MSG: Shutting down NameNode at cai-hadoop01.emc.com/10.77.84.164
+************************************************************/
+hduser@cai-hadoop01:~$
+
+## Starting Daemons ##
+hduser@cai-hadoop01:/usr/local/hadoop/sbin$ ./start-dfs.sh
+Starting namenodes on [localhost]
+localhost: starting namenode, logging to /usr/local/hadoop-2.7.3/logs/hadoop-hduser-namenode-cai-hadoop01.out
+localhost: starting datanode, logging to /usr/local/hadoop-2.7.3/logs/hadoop-hduser-datanode-cai-hadoop01.out
+Starting secondary namenodes [0.0.0.0]
+The authenticity of host '0.0.0.0 (0.0.0.0)' can not be established.
+ECDSA key fingerprint is SHA256:UeRlRbd/Mnx4KLwxSu5xZ9G6B6uD1Q/8v1DU+JW64sI.
+Are you sure you want to continue connecting (yes/no)? yes
+0.0.0.0: Warning: Permanently added '0.0.0.0' (ECDSA) to the list of known hosts.
+0.0.0.0: starting secondarynamenode, logging to /usr/local/hadoop-2.7.3/logs/hadoop-hduser-secondarynamenode-cai-hadoop01.out
+hduser@cai-hadoop01:/usr/local/hadoop/sbin$
+
+============================================================================
+## Hadoop Daemons ##
+hduser@cai-hadoop01:/usr/local/hadoop/sbin$  ps -U hduser -u hduser u
+USER       PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
+hduser    4945  0.0  0.1  22612  5364 pts/0    S+   13:59   0:00 -su
+hduser    4965  0.0  0.1  45364  4868 ?        Ss   14:00   0:00 /lib/systemd/systemd --user
+hduser    4966  0.0  0.0  61200  1936 ?        S    14:00   0:00 (sd-pam)
+hduser    5119  0.0  0.1  95472  4316 ?        S    14:05   0:00 sshd: hduser@pts/2
+hduser    5120  0.0  0.1  22568  5076 pts/2    Ss   14:05   0:00 -bash
+root      5135  0.0  0.1  52284  3644 pts/2    S    14:06   0:00 su - root
+hduser    5737  0.0  0.1  22576  5340 pts/2    S    14:41   0:00 -su
+hduser    6580  1.6  4.5 1478660 139100 ?      Sl   14:48   0:03 /usr/lib/jvm/jdk1.7.0/bin/java -Dproc_namenode -Xmx1000m -Djava.net.preferIPv4Stack=true -Dh
+hduser    6724  1.5  3.8 1480940 117176 ?      Sl   14:48   0:03 /usr/lib/jvm/jdk1.7.0/bin/java -Dproc_datanode -Xmx1000m -Djava.net.preferIPv4Stack=true -Dh
+hduser    6901  1.4  3.9 1457976 120280 ?      Sl   14:49   0:03 /usr/lib/jvm/jdk1.7.0/bin/java -Dproc_secondarynamenode -Xmx1000m -Djava.net.preferIPv4Stack
+hduser    7075  0.0  0.1  37364  3324 pts/2    R+   14:52   0:00 ps -U hduser -u hduser u
+hduser@cai-hadoop01:/usr/local/hadoop/sbin$
+============================================================================
+## Putting Data on HDFS ##
+
+root@cai-hadoop01:/data# ls -ltrh
+total 55M
+-rw-r--r-- 1 root root 2.0M Dec 10  2013 shakespeare.tar.gz
+-rw-r--r-- 1 root root  53M Dec 10  2013 access_log.gz
+root@cai-hadoop01:/data# tar -xvzf shakespeare.tar.gz
+
+hduser@cai-hadoop01:~$ hdfs dfs -mkdir -p /training/data
+hduser@cai-hadoop01:/data$ hdfs dfs -put shakespeare/tragedies /training/data
+
+hduser@cai-hadoop01:/data$ hdfs dfs -put shakespeare /training/data/.
+hduser@cai-hadoop01:/data$ hdfs dfs -ls -R /training/data
+drwxr-xr-x   - hduser supergroup          0 2016-10-13 06:42 /training/data/shakespeare
+-rw-r--r--   1 hduser supergroup    1784616 2016-10-13 06:42 /training/data/shakespeare/comedies
+-rw-r--r--   1 hduser supergroup      58976 2016-10-13 06:42 /training/data/shakespeare/glossary
+-rw-r--r--   1 hduser supergroup    1479035 2016-10-13 06:42 /training/data/shakespeare/histories
+-rw-r--r--   1 hduser supergroup     268140 2016-10-13 06:42 /training/data/shakespeare/poems
+-rw-r--r--   1 hduser supergroup    1752440 2016-10-13 06:42 /training/data/shakespeare/tragedies
+hduser@cai-hadoop01:/data$
+============================================================================
+## Development - Writting and Running a WordCount Job ##
+
+- This!shows!lists!the!locations!where!the!Hadoop!core!API!classes!are!installed.
+
+hduser@cai-hadoop01:/data$ hadoop classpath
+/usr/local/hadoop/etc/hadoop:/usr/local/hadoop/share/hadoop/common/lib/*:/usr/local/hadoop/share/hadoop/common/*:/usr/local/hadoop/share/hadoop/hdfs:/usr/local/hadoop/share/hadoop/hdfs/lib/*:/usr/local/hadoop/share/hadoop/hdfs/*:/usr/local/hadoop/share/hadoop/yarn/lib/*:/usr/local/hadoop/share/hadoop/yarn/*:/usr/local/hadoop/share/hadoop/mapreduce/lib/*:/usr/local/hadoop/share/hadoop/mapreduce/*:/usr/local/hadoop-2.7.3/contrib/capacity-scheduler/*.jar
+hduser@cai-hadoop01:/data$
+============================================================================
+============================================================================
+## MongoDB ##
+root@cai-hadoop01:/usr/local/hadoop/sbin# cat /etc/resolv.conf
+# Dynamic resolv.conf(5) file for glibc resolver(3) generated by resolvconf(8)
+
+#     DO NOT EDIT THIS FILE BY HAND -- YOUR CHANGES WILL BE OVERWRITTEN
+domain emc.com
+search emc.com
+nameserver 10.64.9.50
+nameserver 10.64.19.30
+nameserver 10.64.21.221
+nameserver 10.73.240.235
+
+root@cai-hadoop01:/usr/local/hadoop/sbin#
+
+sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 0C49F3730359A14518585931BC711F9BA15703C6
+
+============================================================================
+## SQOOP ##
+hduser@cai-hadoop01:/downloads$ wget http://www-eu.apache.org/dist/sqoop/1.99.7/sqoop-1.99.7-bin-hadoop200.tar.gz
+root@cai-hadoop01:/downloads# ls -l
+total 444104
+-rwxr-xr-x 1 root root 214092195 Aug 25 14:25 hadoop-2.7.3.tar.gz
+drwxr-xr-x 2 uucp  143      4096 Oct 12 12:09 jdk1.7.0_55
+-rw-r--r-- 1 root root 138220064 Apr 22  2014 jdk-7-linux-x64.tar.gz
+drwxr-xr-x 8 root root      4096 Feb 12 13:26 sqoop-1.99.7-bin-hadoop200
+-rwxr-xr-x 1 root root 102436055 Jul 19  2016 sqoop-1.99.7-bin-hadoop200.tar.gz
+root@cai-hadoop01:/downloads# mkdir /usr/lib/sqoop
+root@cai-hadoop01:/downloads# mv sqoop* /usr/lib/sqoop
+
+
+hduser@cai-hadoop01:/usr/local/sqoop/sqoop-1.99.7-bin-hadoop200$ tail -6 ~/.bashrc
+## SQOOP ##
+export SQOOP_HOME=/usr/local/sqoop
+export SQOOP_CONF_DIR=$SQOOP_HOME/sqoop-1.99.7-bin-hadoop200
+export SQOOP_CLASSPATH=$SQOOP_CONF_DIR
+export PATH=$SQOOP_HOME/bin:$PATH
+
+hduser@cai-hadoop01:/usr/local/sqoop/sqoop-1.99.7-bin-hadoop200$
+
+root@cai-hadoop01:/downloads# mv mysql-connector-java-5.1.40/mysql-connector-java-5.1.40-bin.jar /usr/local/sqoop/lib
+root@cai-hadoop01:/downloads# ls -l /usr/local/sqoop/lib
+-rw-r--r-- 1 root root 990927 Sep 24 13:35 /usr/local/sqoop/lib
+root@cai-hadoop01:/downloads# sudo chmod 755 -R /usr/local/sqoop/
+root@cai-hadoop01:/downloads#
+
+============================================================================
+## SPARK ##
+
+1) Java
+Already installed 
+hduser@cai-hadoop01:~$ java -version
+java version "1.7.0_55"
+2) Scala
+3) GIT
+4) Build Spark
+-------------------------
+	## SCALA ##
+	hduser@cai-hadoop01:/downloads$ sudo wget http://downloads.lightbend.com/scala/2.10.6/scala-2.10.6.tgz
+
+	hduser@cai-hadoop01:/downloads$ sudo tar -xvzf scala-2.10.6.tgz -C /usr/local/src/scala/
+	hduser@cai-hadoop01:/downloads$ which scala
+	/usr/local/src/scala/scala-2.10.6/bin/scala
+	hduser@cai-hadoop01:/downloads$ scala
+	Welcome to Scala version 2.10.6 (Java HotSpot(TM) 64-Bit Server VM, Java 1.7.0_55).
+	Type in expressions to have them evaluated.
+	Type :help for more information.
+
+	scala>
+-------------------------
+	## GIT ##
+	hduser@cai-hadoop01:/downloads$ sudo apt-get install git
+	Reading package lists... Done
+	Building dependency tree
+	Reading state information... Done
+	git is already the newest version (1:2.7.4-0ubuntu1).
+	The following packages were automatically installed and are no longer required:
+	  linux-headers-4.4.0-31 linux-headers-4.4.0-31-generic linux-headers-4.4.0-42 linux-headers-4.4.0-42-generic linux-headers-4.4.0-62
+	  linux-headers-4.4.0-62-generic linux-image-4.4.0-31-generic linux-image-4.4.0-42-generic linux-image-4.4.0-62-generic linux-image-extra-4.4.0-31-generic
+	  linux-image-extra-4.4.0-42-generic linux-image-extra-4.4.0-62-generic
+	Use 'sudo apt autoremove' to remove them.
+	0 upgraded, 0 newly installed, 0 to remove and 95 not upgraded.
+	hduser@cai-hadoop01:/downloads$
+-------------------------
+hduser@cai-hadoop01:/downloads$ ls -ltrh
+total 567M
+-rw-r--r--  1 root root 132M Apr 22  2014 jdk-7-linux-x64.tar.gz
+-rw-r--r--  1 root root  29M Sep 18  2015 scala-2.10.6.tgz
+-rwxr-xr-x  1 root root  98M Jul 19  2016 sqoop-1.99.7-bin-hadoop200.tar.gz
+-rwxr-xr-x  1 root root 205M Aug 25  2016 hadoop-2.7.3.tar.gz
+drwxr-xr-x  4 root root 4.0K Sep 24 13:35 mysql-connector-java-5.1.40
+drwxr-xr-x  2 uucp  143 4.0K Oct 12 12:09 jdk1.7.0_55
+drwxr-xr-x 34  500  500 4.0K Nov  2 17:06 spark-1.6.3
+-rw-r--r--  1 root root  12M Nov  7 23:26 spark-1.6.3.tgz
+-rwxr-xr-x  1 root root 3.8M Feb 12 12:50 mysql-connector-java-5.1.40.tar.gz
+-rw-r--r--  1 root root  89M Feb 13 10:16 apache-hive-1.2.1-bin.tar.gz
+hduser@cai-hadoop01:/downloads$ cd spark-1.6.3
+hduser@cai-hadoop01:/downloads/spark-1.6.3$
+hduser@cai-hadoop01:/downloads/spark-1.6.3$ ls -ltrh
+total 1.6M
+-rw-r--r--  1 500 500  23K Nov  2 17:06 NOTICE
+-rw-r--r--  1 500 500  988 Nov  2 17:06 CONTRIBUTING.md
+drwxr-xr-x  2 500 500 4.0K Nov  2 17:06 build
+drwxr-xr-x  3 500 500 4.0K Nov  2 17:06 unsafe
+-rw-r--r--  1 500 500  848 Nov  2 17:06 tox.ini
+drwxr-xr-x  3 500 500 4.0K Nov  2 17:06 tools
+drwxr-xr-x  3 500 500 4.0K Nov  2 17:06 tags
+drwxr-xr-x  3 500 500 4.0K Nov  2 17:06 streaming
+drwxr-xr-x  6 500 500 4.0K Nov  2 17:06 sql
+-rw-r--r--  1 500 500  13K Nov  2 17:06 scalastyle-config.xml
+drwxr-xr-x  2 500 500 4.0K Nov  2 17:06 sbt
+drwxr-xr-x  2 500 500 4.0K Nov  2 17:06 sbin
+drwxr-xr-x  5 500 500 4.0K Nov  2 17:06 repl
+drwxr-xr-x  3 500 500 4.0K Nov  2 17:06 R
+drwxr-xr-x  6 500 500 4.0K Nov  2 17:06 python
+-rw-r--r--  1 500 500  14K Nov  2 17:06 pylintrc
+drwxr-xr-x  2 500 500 4.0K Nov  2 17:06 project
+drwxr-xr-x  5 500 500 4.0K Nov  2 17:06 network
+drwxr-xr-x  2 500 500 4.0K Nov  2 17:06 licenses
+drwxr-xr-x  4 500 500 4.0K Nov  2 17:06 graphx
+drwxr-xr-x  6 500 500 4.0K Nov  2 17:06 extras
+drwxr-xr-x 11 500 500 4.0K Nov  2 17:06 external
+drwxr-xr-x  3 500 500 4.0K Nov  2 17:06 examples
+drwxr-xr-x  3 500 500 4.0K Nov  2 17:06 ec2
+drwxr-xr-x  9 500 500 4.0K Nov  2 17:06 docs
+drwxr-xr-x  3 500 500 4.0K Nov  2 17:06 docker-integration-tests
+drwxr-xr-x  4 500 500 4.0K Nov  2 17:06 docker
+drwxr-xr-x  7 500 500 4.0K Nov  2 17:06 dev
+drwxr-xr-x  3 500 500 4.0K Nov  2 17:06 data
+drwxr-xr-x  2 500 500 4.0K Nov  2 17:06 conf
+-rw-r--r--  1 500 500 1.3M Nov  2 17:06 CHANGES.txt
+drwxr-xr-x  3 500 500 4.0K Nov  2 17:06 bagel
+drwxr-xr-x  3 500 500 4.0K Nov  2 17:06 yarn
+-rw-r--r--  1 500 500 3.3K Nov  2 17:06 README.md
+-rw-r--r--  1 500 500  90K Nov  2 17:06 pom.xml
+drwxr-xr-x  3 500 500 4.0K Nov  2 17:06 mllib
+-rwxr-xr-x  1 500 500 8.4K Nov  2 17:06 make-distribution.sh
+-rw-r--r--  1 500 500  17K Nov  2 17:06 LICENSE
+drwxr-xr-x  3 500 500 4.0K Nov  2 17:06 launcher
+drwxr-xr-x  3 500 500 4.0K Nov  2 17:06 core
+drwxr-xr-x  2 500 500 4.0K Nov  2 17:06 bin
+drwxr-xr-x  3 500 500 4.0K Nov  2 17:06 assembly
+hduser@cai-hadoop01:/downloads/spark-1.6.3$ 
+
+============================================================================
+
+[warn] Merging 'org/objenesis/strategy/SerializingInstantiatorStrategy.class' with strategy 'first'
+[warn] Merging 'org/objenesis/strategy/StdInstantiatorStrategy.class' with strategy 'first'
+[warn] Merging 'plugin.properties' with strategy 'first'
+[warn] Merging 'reference.conf' with strategy 'concat'
+[warn] Merging 'rootdoc.txt' with strategy 'first'
+[warn] Strategy 'concat' was applied to a file
+[warn] Strategy 'discard' was applied to 3 files
+[warn] Strategy 'filterDistinctLines' was applied to 9 files
+[warn] Strategy 'first' was applied to 277 files
+[info] SHA-1: e73fc04d344f99dd00cc0e19c71ee3c4bbdacfb9
+[info] Packaging /downloads/spark-1.6.3/assembly/target/scala-2.10/spark-assembly-1.6.3-hadoop2.2.0.jar ...
+[info] Done packaging.
+[success] Total time: 10126 s, completed Feb 27, 2017 10:53:49 AM
+hduser@cai-hadoop01:/downloads/spark-1.6.3$
+============================================================================
+hduser@cai-hadoop01:/downloads$ du -sh spark-1.6.3
+4.2G    spark-1.6.3
+hduser@cai-hadoop01:/downloads$
+============================================================================
+
+scala> val f = sc.textFile("/tmp/README.md")
+17/02/27 11:29:24 INFO storage.MemoryStore: Block broadcast_0 stored as values in memory (estimated size 104.8 KB, free 517.3 MB)
+17/02/27 11:29:24 INFO storage.MemoryStore: Block broadcast_0_piece0 stored as bytes in memory (estimated size 10.0 KB, free 517.3 MB)
+17/02/27 11:29:24 INFO storage.BlockManagerInfo: Added broadcast_0_piece0 in memory on localhost:36573 (size: 10.0 KB, free: 517.4 MB)
+17/02/27 11:29:24 INFO spark.SparkContext: Created broadcast 0 from textFile at <console>:27
+f: org.apache.spark.rdd.RDD[String] = /tmp/README.md MapPartitionsRDD[1] at textFile at <console>:27
+
+scala>
+============================================================================
+hduser@cai-hadoop01:/downloads/spark-1.6.3$ hdfs dfs -mkdir /tmp
+hduser@cai-hadoop01:/downloads/spark-1.6.3$ hdfs dfs -put README.md /tmp/
+
+hduser@cai-hadoop01:/downloads/spark-1.6.3$ hdfs dfs -ls /tmp/
+Found 1 items
+-rw-r--r--   1 hduser supergroup       3359 2017-02-27 11:24 /tmp/README.md
+hduser@cai-hadoop01:/downloads/spark-1.6.3$
+============================================================================
+scala> f.collect()
+17/02/27 11:30:05 INFO spark.SparkContext: Starting job: collect at <console>:30
+17/02/27 11:30:05 INFO scheduler.DAGScheduler: Got job 1 (collect at <console>:30) with 1 output partitions
+17/02/27 11:30:05 INFO scheduler.DAGScheduler: Final stage: ResultStage 1 (collect at <console>:30)
+17/02/27 11:30:05 INFO scheduler.DAGScheduler: Parents of final stage: List()
+17/02/27 11:30:05 INFO scheduler.DAGScheduler: Missing parents: List()
+17/02/27 11:30:05 INFO scheduler.DAGScheduler: Submitting ResultStage 1 (/tmp/README.md MapPartitionsRDD[1] at textFile at <console>:27), which has no missing parents
+17/02/27 11:30:05 INFO storage.MemoryStore: Block broadcast_2 stored as values in memory (estimated size 3.1 KB, free 517.3 MB)
+17/02/27 11:30:05 INFO storage.MemoryStore: Block broadcast_2_piece0 stored as bytes in memory (estimated size 1823.0 B, free 517.3 MB)
+17/02/27 11:30:05 INFO storage.BlockManagerInfo: Added broadcast_2_piece0 in memory on localhost:36573 (size: 1823.0 B, free: 517.4 MB)
+17/02/27 11:30:05 INFO spark.SparkContext: Created broadcast 2 from broadcast at DAGScheduler.scala:1006
+17/02/27 11:30:05 INFO scheduler.DAGScheduler: Submitting 1 missing tasks from ResultStage 1 (/tmp/README.md MapPartitionsRDD[1] at textFile at <console>:27)
+17/02/27 11:30:05 INFO scheduler.TaskSchedulerImpl: Adding task set 1.0 with 1 tasks
+17/02/27 11:30:05 INFO scheduler.TaskSetManager: Starting task 0.0 in stage 1.0 (TID 1, localhost, partition 0,ANY, 2138 bytes)
+17/02/27 11:30:05 INFO executor.Executor: Running task 0.0 in stage 1.0 (TID 1)
+17/02/27 11:30:05 INFO rdd.HadoopRDD: Input split: hdfs://localhost:54310/tmp/README.md:0+3359
+17/02/27 11:30:05 INFO executor.Executor: Finished task 0.0 in stage 1.0 (TID 1). 5611 bytes result sent to driver
+17/02/27 11:30:05 INFO scheduler.DAGScheduler: ResultStage 1 (collect at <console>:30) finished in 0.053 s
+17/02/27 11:30:05 INFO scheduler.DAGScheduler: Job 1 finished: collect at <console>:30, took 0.067566 s
+17/02/27 11:30:05 INFO scheduler.TaskSetManager: Finished task 0.0 in stage 1.0 (TID 1) in 57 ms on localhost (1/1)
+17/02/27 11:30:05 INFO scheduler.TaskSchedulerImpl: Removed TaskSet 1.0, whose tasks have all completed, from pool
+res1: Array[String] = Array(# Apache Spark, "", Spark is a fast and general cluster computing system for Big Data. It provides, high-level APIs in Scala, Java, Python, and R, and an optimized engine that, supports general computation graphs for data analysis. It also supports a, rich set of higher-level tools including Spark SQL for SQL and DataFrames,, MLlib for machine learning, GraphX for graph processing,, and Spark Streaming for stream processing., "", <http://spark.apache.org/>, "", "", ## Online Documentation, "", You can find the latest Spark documentation, including a programming, guide, on the [project web page](http://spark.apache.org/documentation.html), and [project wiki](https://cwiki.apache.org/confluence/display/SPARK)., This README file only contains basic setup instruc...
+scala>
+============================================================================
+hduser@cai-hadoop01:/downloads$ sudo mv spark-1.6.3 /usr/local/spark/
+
+============================================================================
+## Installing PIP ##
+sudo apt-get install python-pip python-dev build-essential
+sudo pip install --upgrade pip 
+sudo pip install --upgrade virtualenv 
+sudo pip install py4j
+
+sudo apt-get install python-pip python-dev build-essential 
+============================================================================
+
+hduser@cai-hadoop01:/usr/local/spark/spark-1.6.3$ sudo vi sparktest.py
+hduser@cai-hadoop01:/usr/local/spark/spark-1.6.3$ cat sparktest.py
+from pyspark import SparkContext
+sc = SparkContext("local","simple app")
+
+a=[1,4,3,5]
+a = sc.parallelize(a)
+print a
+print a.take(2)
+hduser@cai-hadoop01:/usr/local/spark/spark-1.6.3$
+============================================================================
+hduser@cai-hadoop01:/usr/local/spark/spark-1.6.3/bin$ ./spark-submit $SPARK_HOME/sparktest.py
+17/02/27 12:02:19 INFO spark.SparkContext: Running Spark version 1.6.3
+17/02/27 12:02:20 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+17/02/27 12:02:21 INFO spark.SecurityManager: Changing view acls to: hduser
+17/02/27 12:02:21 INFO spark.SecurityManager: Changing modify acls to: hduser
+17/02/27 12:02:21 INFO spark.SecurityManager: SecurityManager: authentication disabled; ui acls disabled; users with view permissions: Set(hduser); users with modify permissions: Set(hduser)
+17/02/27 12:02:21 INFO util.Utils: Successfully started service 'sparkDriver' on port 44301.
+17/02/27 12:02:21 INFO slf4j.Slf4jLogger: Slf4jLogger started
+17/02/27 12:02:21 INFO Remoting: Starting remoting
+17/02/27 12:02:22 INFO Remoting: Remoting started; listening on addresses :[akka.tcp://sparkDriverActorSystem@10.77.84.164:44652]
+17/02/27 12:02:22 INFO util.Utils: Successfully started service 'sparkDriverActorSystem' on port 44652.
+17/02/27 12:02:22 INFO spark.SparkEnv: Registering MapOutputTracker
+17/02/27 12:02:22 INFO spark.SparkEnv: Registering BlockManagerMaster
+17/02/27 12:02:22 INFO storage.DiskBlockManager: Created local directory at /tmp/blockmgr-a995af4f-f54a-45c8-b34c-2472c8ecac2d
+17/02/27 12:02:22 INFO storage.MemoryStore: MemoryStore started with capacity 517.4 MB
+17/02/27 12:02:22 INFO spark.SparkEnv: Registering OutputCommitCoordinator
+17/02/27 12:02:22 INFO server.Server: jetty-8.y.z-SNAPSHOT
+17/02/27 12:02:22 INFO server.AbstractConnector: Started SelectChannelConnector@0.0.0.0:4040
+17/02/27 12:02:22 INFO util.Utils: Successfully started service 'SparkUI' on port 4040.
+17/02/27 12:02:22 INFO ui.SparkUI: Started SparkUI at http://10.77.84.164:4040
+17/02/27 12:02:22 INFO util.Utils: Copying /usr/local/spark/spark-1.6.3/sparktest.py to /tmp/spark-7aaac209-816a-4b29-b19d-d0a8a6723bcc/userFiles-fd36b2b6-bd1e-4615-8791-bd604512e776/sparktest.py
+17/02/27 12:02:22 INFO spark.SparkContext: Added file file:/usr/local/spark/spark-1.6.3/sparktest.py at file:/usr/local/spark/spark-1.6.3/sparktest.py with timestamp 1488218542760
+17/02/27 12:02:23 INFO executor.Executor: Starting executor ID driver on host localhost
+17/02/27 12:02:23 INFO util.Utils: Successfully started service 'org.apache.spark.network.netty.NettyBlockTransferService' on port 44174.
+17/02/27 12:02:23 INFO netty.NettyBlockTransferService: Server created on 44174
+17/02/27 12:02:23 INFO storage.BlockManagerMaster: Trying to register BlockManager
+17/02/27 12:02:23 INFO storage.BlockManagerMasterEndpoint: Registering block manager localhost:44174 with 517.4 MB RAM, BlockManagerId(driver, localhost, 44174)
+17/02/27 12:02:23 INFO storage.BlockManagerMaster: Registered BlockManager
+ParallelCollectionRDD[0] at parallelize at PythonRDD.scala:423
+17/02/27 12:02:23 INFO spark.SparkContext: Starting job: runJob at PythonRDD.scala:393
+17/02/27 12:02:23 INFO scheduler.DAGScheduler: Got job 0 (runJob at PythonRDD.scala:393) with 1 output partitions
+17/02/27 12:02:23 INFO scheduler.DAGScheduler: Final stage: ResultStage 0 (runJob at PythonRDD.scala:393)
+17/02/27 12:02:23 INFO scheduler.DAGScheduler: Parents of final stage: List()
+17/02/27 12:02:23 INFO scheduler.DAGScheduler: Missing parents: List()
+17/02/27 12:02:23 INFO scheduler.DAGScheduler: Submitting ResultStage 0 (PythonRDD[1] at RDD at PythonRDD.scala:43), which has no missing parents
+17/02/27 12:02:23 INFO storage.MemoryStore: Block broadcast_0 stored as values in memory (estimated size 3.3 KB, free 517.4 MB)
+17/02/27 12:02:23 INFO storage.MemoryStore: Block broadcast_0_piece0 stored as bytes in memory (estimated size 2.2 KB, free 517.4 MB)
+17/02/27 12:02:23 INFO storage.BlockManagerInfo: Added broadcast_0_piece0 in memory on localhost:44174 (size: 2.2 KB, free: 517.4 MB)
+17/02/27 12:02:23 INFO spark.SparkContext: Created broadcast 0 from broadcast at DAGScheduler.scala:1006
+17/02/27 12:02:23 INFO scheduler.DAGScheduler: Submitting 1 missing tasks from ResultStage 0 (PythonRDD[1] at RDD at PythonRDD.scala:43)
+17/02/27 12:02:23 INFO scheduler.TaskSchedulerImpl: Adding task set 0.0 with 1 tasks
+17/02/27 12:02:23 INFO scheduler.TaskSetManager: Starting task 0.0 in stage 0.0 (TID 0, localhost, partition 0,PROCESS_LOCAL, 2146 bytes)
+17/02/27 12:02:23 INFO executor.Executor: Running task 0.0 in stage 0.0 (TID 0)
+17/02/27 12:02:23 INFO executor.Executor: Fetching file:/usr/local/spark/spark-1.6.3/sparktest.py with timestamp 1488218542760
+17/02/27 12:02:23 INFO util.Utils: /usr/local/spark/spark-1.6.3/sparktest.py has been previously copied to /tmp/spark-7aaac209-816a-4b29-b19d-d0a8a6723bcc/userFiles-fd36b2b6-bd1e-4615-8791-bd604512e776/sparktest.py
+17/02/27 12:02:24 INFO python.PythonRunner: Times: total = 241, boot = 222, init = 19, finish = 0
+17/02/27 12:02:24 INFO executor.Executor: Finished task 0.0 in stage 0.0 (TID 0). 1014 bytes result sent to driver
+17/02/27 12:02:24 INFO scheduler.DAGScheduler: ResultStage 0 (runJob at PythonRDD.scala:393) finished in 0.401 s
+17/02/27 12:02:24 INFO scheduler.DAGScheduler: Job 0 finished: runJob at PythonRDD.scala:393, took 0.639312 s
+17/02/27 12:02:24 INFO scheduler.TaskSetManager: Finished task 0.0 in stage 0.0 (TID 0) in 392 ms on localhost (1/1)
+17/02/27 12:02:24 INFO scheduler.TaskSchedulerImpl: Removed TaskSet 0.0, whose tasks have all completed, from pool
+[1, 4]
+17/02/27 12:02:24 INFO spark.SparkContext: Invoking stop() from shutdown hook
+17/02/27 12:02:24 INFO handler.ContextHandler: stopped o.e.j.s.ServletContextHandler{/metrics/json,null}
+17/02/27 12:02:24 INFO handler.ContextHandler: stopped o.e.j.s.ServletContextHandler{/stages/stage/kill,null}
+17/02/27 12:02:24 INFO handler.ContextHandler: stopped o.e.j.s.ServletContextHandler{/api,null}
+17/02/27 12:02:24 INFO handler.ContextHandler: stopped o.e.j.s.ServletContextHandler{/,null}
+17/02/27 12:02:24 INFO handler.ContextHandler: stopped o.e.j.s.ServletContextHandler{/static,null}
+17/02/27 12:02:24 INFO handler.ContextHandler: stopped o.e.j.s.ServletContextHandler{/executors/threadDump/json,null}
+17/02/27 12:02:24 INFO handler.ContextHandler: stopped o.e.j.s.ServletContextHandler{/executors/threadDump,null}
+17/02/27 12:02:24 INFO handler.ContextHandler: stopped o.e.j.s.ServletContextHandler{/executors/json,null}
+17/02/27 12:02:24 INFO handler.ContextHandler: stopped o.e.j.s.ServletContextHandler{/executors,null}
+17/02/27 12:02:24 INFO handler.ContextHandler: stopped o.e.j.s.ServletContextHandler{/environment/json,null}
+17/02/27 12:02:24 INFO handler.ContextHandler: stopped o.e.j.s.ServletContextHandler{/environment,null}
+17/02/27 12:02:24 INFO handler.ContextHandler: stopped o.e.j.s.ServletContextHandler{/storage/rdd/json,null}
+17/02/27 12:02:24 INFO handler.ContextHandler: stopped o.e.j.s.ServletContextHandler{/storage/rdd,null}
+17/02/27 12:02:24 INFO handler.ContextHandler: stopped o.e.j.s.ServletContextHandler{/storage/json,null}
+17/02/27 12:02:24 INFO handler.ContextHandler: stopped o.e.j.s.ServletContextHandler{/storage,null}
+17/02/27 12:02:24 INFO handler.ContextHandler: stopped o.e.j.s.ServletContextHandler{/stages/pool/json,null}
+17/02/27 12:02:24 INFO handler.ContextHandler: stopped o.e.j.s.ServletContextHandler{/stages/pool,null}
+17/02/27 12:02:24 INFO handler.ContextHandler: stopped o.e.j.s.ServletContextHandler{/stages/stage/json,null}
+17/02/27 12:02:24 INFO handler.ContextHandler: stopped o.e.j.s.ServletContextHandler{/stages/stage,null}
+17/02/27 12:02:24 INFO handler.ContextHandler: stopped o.e.j.s.ServletContextHandler{/stages/json,null}
+17/02/27 12:02:24 INFO handler.ContextHandler: stopped o.e.j.s.ServletContextHandler{/stages,null}
+17/02/27 12:02:24 INFO handler.ContextHandler: stopped o.e.j.s.ServletContextHandler{/jobs/job/json,null}
+17/02/27 12:02:24 INFO handler.ContextHandler: stopped o.e.j.s.ServletContextHandler{/jobs/job,null}
+17/02/27 12:02:24 INFO handler.ContextHandler: stopped o.e.j.s.ServletContextHandler{/jobs/json,null}
+17/02/27 12:02:24 INFO handler.ContextHandler: stopped o.e.j.s.ServletContextHandler{/jobs,null}
+17/02/27 12:02:24 INFO storage.BlockManagerInfo: Removed broadcast_0_piece0 on localhost:44174 in memory (size: 2.2 KB, free: 517.4 MB)
+17/02/27 12:02:24 INFO spark.ContextCleaner: Cleaned accumulator 2
+17/02/27 12:02:24 INFO spark.ContextCleaner: Cleaned accumulator 1
+17/02/27 12:02:24 INFO ui.SparkUI: Stopped Spark web UI at http://10.77.84.164:4040
+17/02/27 12:02:24 INFO spark.MapOutputTrackerMasterEndpoint: MapOutputTrackerMasterEndpoint stopped!
+17/02/27 12:02:24 INFO storage.MemoryStore: MemoryStore cleared
+17/02/27 12:02:24 INFO storage.BlockManager: BlockManager stopped
+17/02/27 12:02:24 INFO storage.BlockManagerMaster: BlockManagerMaster stopped
+17/02/27 12:02:24 INFO scheduler.OutputCommitCoordinator$OutputCommitCoordinatorEndpoint: OutputCommitCoordinator stopped!
+17/02/27 12:02:24 INFO remote.RemoteActorRefProvider$RemotingTerminator: Shutting down remote daemon.
+17/02/27 12:02:24 INFO remote.RemoteActorRefProvider$RemotingTerminator: Remote daemon shut down; proceeding with flushing remote transports.
+17/02/27 12:02:24 INFO spark.SparkContext: Successfully stopped SparkContext
+17/02/27 12:02:24 INFO util.ShutdownHookManager: Shutdown hook called
+17/02/27 12:02:24 INFO util.ShutdownHookManager: Deleting directory /tmp/spark-7aaac209-816a-4b29-b19d-d0a8a6723bcc/pyspark-31bc9ab6-9246-4972-ab02-81935b081978
+17/02/27 12:02:24 INFO util.ShutdownHookManager: Deleting directory /tmp/spark-7aaac209-816a-4b29-b19d-d0a8a6723bcc
+hduser@cai-hadoop01:/usr/local/spark/spark-1.6.3/bin$
+
+================================================================
+## Installing Numpy ##
+
+hduser@cai-hadoop01:~$  sudo pip install numpy
+[sudo] password for hduser:
+The directory '/home/hduser/.cache/pip/http' or its parent directory is not owned by the current user and the cache has been disabled. Please check the permissions and owner of that directory. If executing pip with sudo, you may want sudo's -H flag.
+The directory '/home/hduser/.cache/pip' or its parent directory is not owned by the current user and caching wheels has been disabled. check the permissions and owner of that directory. If executing pip with sudo, you may want sudo's -H flag.
+Collecting numpy
+  Downloading numpy-1.12.0-cp27-cp27mu-manylinux1_x86_64.whl (16.5MB)
+    100% |████████████████████████████████| 16.5MB 79kB/s
+Installing collected packages: numpy
+Successfully installed numpy-1.12.0
+hduser@cai-hadoop01:~$
+================================================================
+## Installing MYSQL ##
+root@cai-hadoop01:/downloads# sudo apt-get install mysql-server
+root@cai-hadoop01:/downloads# mysql -u root -p
+mysql> CREATE DATABASE sports;
+
+================================================================
+## Installing HIVE ##
+https://mongodblog.wordpress.com/2016/02/27/apache-hive-2-0-0-installation-on-ubuntu-linux-14-04-lts/
+
+## Hive Installation ##
+
+hduser@cai-hadoop01:/usr/local$ id
+uid=1000(hduser) gid=1000(hadoop) groups=1000(hadoop)
+hduser@cai-hadoop01:/usr/local$
+
+
+hduser@cai-hadoop01:/usr/local$ mkdir hive
+
+hduser@cai-hadoop01:/usr/local$ ls -ld hive
+drwxr-xr-x 2 hduser hadoop 4096 Mar  4 08:10 hive
+
+---------------------------------------------------
+
+** Tar **
+hduser@cai-hadoop01:/downloads$ ls -ltrh | grep -i hive
+-rwxr-xr-x 1 root root 134M May 24  2016 apache-hive-2.0.1-bin.tar.gz
+hduser@cai-hadoop01:/downloads$
+
+hduser@cai-hadoop01:/downloads$ tar -xvzf apache-hive-2.0.1-bin.tar.gz -C /usr/local/hive
+
+
+---------------------------------------------------
+
+** Moving files under /usr/local/hive **
+
+hduser@cai-hadoop01:/usr/local/hive$ ls -ltrh
+total 4.0K
+drwxr-xr-x 9 hduser hadoop 4.0K Mar  4 08:12 apache-hive-2.0.1-bin
+hduser@cai-hadoop01:/usr/local/hive$ cd apache-hive-2.0.1-bin/
+hduser@cai-hadoop01:/usr/local/hive/apache-hive-2.0.1-bin$ mv * ../
+hduser@cai-hadoop01:/usr/local/hive/apache-hive-2.0.1-bin$
+
+hduser@cai-hadoop01:/usr/local/hive$ rm -r apache-hive-2.0.1-bin
+
+hduser@cai-hadoop01:/usr/local/hive$ ls -ltrh
+total 600K
+-rw-r--r-- 1 hduser hadoop 4.3K May  3  2016 README.txt
+-rw-r--r-- 1 hduser hadoop  513 May  3  2016 NOTICE
+-rw-r--r-- 1 hduser hadoop  26K May  3  2016 LICENSE
+-rw-r--r-- 1 hduser hadoop 521K May  3  2016 RELEASE_NOTES.txt
+drwxr-xr-x 2 hduser hadoop 4.0K Mar  4 08:12 jdbc
+drwxr-xr-x 4 hduser hadoop 4.0K Mar  4 08:12 examples
+drwxr-xr-x 4 hduser hadoop 4.0K Mar  4 08:12 scripts
+drwxr-xr-x 3 hduser hadoop 4.0K Mar  4 08:12 bin
+drwxr-xr-x 2 hduser hadoop 4.0K Mar  4 08:12 conf
+drwxr-xr-x 4 hduser hadoop  12K Mar  4 08:12 lib
+drwxr-xr-x 7 hduser hadoop 4.0K Mar  4 08:12 hcatalog
+hduser@cai-hadoop01:/usr/local/hive$
+
+---------------------------------------------------
+
+** basrhrc **
+
+# Add Hadoop bin/ directory to PATH
+export PATH=$PATH:$HADOOP_PREFIX/bin
+export HADOOP_HOME=/usr/local/hadoop-2.7.3
+export HADOOP_CONF_DIR=$HADOOP_HOME/etc/hadoop
+export HADOOP_MAPRED_HOME=$HADOOP_HOME
+export HADOOP_COMMON_HOME=$HADOOP_HOME
+export HADOOP_HDFS_HOME=$HADOOP_HOME
+export HADOOP_YARN_HOME=$HADOOP_HOME
+
+** HIVE **
+export HIVE_HOME=/usr/local/hive
+export PATH=$HIVE_HOME/bin:$PATH
+
+---------------------------------------------------
+
+** Configure Hive with Hadoop **
+hduser@cai-hadoop01:/usr/local/hive/conf$ cp hive-env.sh.template hive-env.sh
+
+** Appended the following **
+hduser@cai-hadoop01:/usr/local/hive/conf$ tail -1 hive-env.sh
+export HADOOP_HOME=/usr/local/hadoop-2.7.3
+hduser@cai-hadoop01:/usr/local/hive/conf$
+
+---------------------------------------------------
+
+** Creating a metastore in MYSQL **
+
+hduser@cai-hadoop01:/usr/local/hive/conf$ sudo mysql -u root -p
+
+mysql> CREATE DATABASE metastore;
+Query OK, 1 row affected (0.01 sec)
+
+mysql> USE metastore;
+Database changed
+mysql>
+
+
+hduser@cai-hadoop01:/usr/local/hive$ ls scripts/metastore/upgrade/mysql/hive-schema-
+hive-schema-0.10.0.mysql.sql  hive-schema-0.14.0.mysql.sql  hive-schema-0.5.0.mysql.sql   hive-schema-0.9.0.mysql.sql   hive-schema-2.0.0.mysql.sql
+hive-schema-0.11.0.mysql.sql  hive-schema-0.3.0.mysql.sql   hive-schema-0.6.0.mysql.sql   hive-schema-1.1.0.mysql.sql
+hive-schema-0.12.0.mysql.sql  hive-schema-0.4.0.mysql.sql   hive-schema-0.7.0.mysql.sql   hive-schema-1.2.0.mysql.sql
+hive-schema-0.13.0.mysql.sql  hive-schema-0.4.1.mysql.sql   hive-schema-0.8.0.mysql.sql   hive-schema-1.3.0.mysql.sql
+
+** Selecting Schema Latest Version **
+hduser@cai-hadoop01:/usr/local/hive$ ls -l /usr/local/hive/scripts/metastore/upgrade/mysql/hive-schema-2.0.0.mysql.sql
+-rw-r--r-- 1 hduser hadoop 34845 Apr 22  2016 /usr/local/hive/scripts/metastore/upgrade/mysql/hive-schema-2.0.0.mysql.sql
+hduser@cai-hadoop01:/usr/local/hive$
+
+mysql> SOURCE /usr/local/hive/scripts/metastore/upgrade/mysql/hive-schema-2.0.0.mysql.sql;
+
+mysql> CREATE USER 'hiveuser' @'%' IDENTIFIED BY 'P@ssw0rd';
+Query OK, 0 rows affected (0.00 sec)
+
+
+mysql> GRANT all on *.* to 'hiveuser'@localhost identified by 'P@ssw0rd';
+Query OK, 0 rows affected, 1 warning (0.00 sec)
+
+
+
+mysql>  flush privileges;
+Query OK, 0 rows affected (0.00 sec)
+
+---------------------------------------------------
+
+** Editing hive-site.xml **
+hduser@cai-hadoop01:/usr/local/hive/conf$ cp hive-default.xml.template hive-site.xml
+
+
+  <property>
+    <name>javax.jdo.option.ConnectionURL</name>
+    <value>jdbc:mysql://localhost/metastore?createDatabaseIfNotExist=true&amp;useSSL=false</value>
+    <description>JDBC connect string for a JDBC metastore</description>
+  </property>
+
+    <property>
+    <name>javax.jdo.option.ConnectionUserName</name>
+    <value>hiveuser</value>
+    <description>Username to use against metastore database</description>
+  </property>
+
+  
+   <property>
+    <name>javax.jdo.option.ConnectionPassword</name>
+    <value>P@ssw0rd</value>
+    <description>password to use against metastore database</description>
+  </property>
+
+---------------------------------------------------
+
+** Creating Required Dirs and Permissions **
+hduser@cai-hadoop01:/usr/local/hive/conf$ hdfs dfs -mkdir -p /user/hive/warehouse
+hduser@cai-hadoop01:/usr/local/hive/conf$ hdfs dfs -chmod g+w /tmp
+hduser@cai-hadoop01:/usr/local/hive/conf$ hdfs dfs -chmod g+w /user/hive/warehouse
+hduser@cai-hadoop01:/usr/local/hive/conf$
+
+---------------------------------------------------
+
+hduser@cai-hadoop01:/usr/local/hive/lib$ cp /usr/share/java/mysql-connector-java-5.1.38.jar .
+
+schematool -dbType mysql -initSchema
+
+---------------------------------------------------
+
+hduser@cai-hadoop01:/usr/local/hive/bin$ hive
+ls: cannot access '/usr/local/spark/spark-1.6.3/lib/spark-assembly-*.jar': No such file or directory
+SLF4J: Class path contains multiple SLF4J bindings.
+SLF4J: Found binding in [jar:file:/usr/local/hive/lib/log4j-slf4j-impl-2.4.1.jar!/org/slf4j/impl/StaticLoggerBinder.class]
+SLF4J: Found binding in [jar:file:/usr/local/hadoop-2.7.3/share/hadoop/common/lib/slf4j-log4j12-1.7.10.jar!/org/slf4j/impl/StaticLoggerBinder.class]
+SLF4J: See http://www.slf4j.org/codes.html#multiple_bindings for an explanation.
+SLF4J: Actual binding is of type [org.apache.logging.slf4j.Log4jLoggerFactory]
+
+Logging initialized using configuration in jar:file:/usr/local/hive/lib/hive-common-2.0.1.jar!/hive-log4j2.properties
+Hive-on-MR is deprecated in Hive 2 and may not be available in the future versions. Consider using a different execution engine (i.e. tez, spark) or using Hive 1.X releases.
+hive> show tables;
+OK
+Time taken: 0.747 seconds
+hive>
+
+
+---------------------------------------------------
+
+** Starting Hiveserver2 **
+
+hduser@cai-hadoop01:/usr/local/hive/bin$  nohup /usr/local/hive/bin/hiveserver2 >/tmp/hiveserver2.out 2> /tmp/hiveserver2.log &
+[2] 7067
+hduser@cai-hadoop01:/usr/local/hive/bin$
+
+
+
+hduser@cai-hadoop01:/usr/local/hive/bin$ ./beeline -u jdbc:hive2://localhost:10000
+ls: cannot access '/usr/local/spark/spark-1.6.3/lib/spark-assembly-*.jar': No such file or directory
+ls: cannot access '/usr/local/hive/lib/hive-jdbc-*-standalone.jar': No such file or directory
+Connecting to jdbc:hive2://localhost:10000
+SLF4J: Class path contains multiple SLF4J bindings.
+SLF4J: Found binding in [jar:file:/usr/local/hive/lib/log4j-slf4j-impl-2.4.1.jar!/org/slf4j/impl/StaticLoggerBinder.class]
+SLF4J: Found binding in [jar:file:/usr/local/hadoop-2.7.3/share/hadoop/common/lib/slf4j-log4j12-1.7.10.jar!/org/slf4j/impl/StaticLoggerBinder.class]
+SLF4J: See http://www.slf4j.org/codes.html#multiple_bindings for an explanation.
+SLF4J: Actual binding is of type [org.apache.logging.slf4j.Log4jLoggerFactory]
+Error: Failed to open new session: java.lang.RuntimeException: org.apache.hadoop.ipc.RemoteException(org.apache.hadoop.security.authorize.AuthorizationException): User: hduser is not allowed to impersonate anonymous (state=,code=0)
+Beeline version 2.0.1 by Apache Hive
+beeline>
+
+---------------------------------------------------
+
+** Errors **
+/tmp/hduser/hive.log
+
+
+
+
+2017-03-04T10:35:32,409 INFO  [HiveServer2-Handler-Pool: Thread-42]: thrift.ThriftCLIService (ThriftCLIService.java:OpenSession(315)) - Client protocol version: HIVE_CLI_SERVICE_PROTOCOL_V8
+2017-03-04T10:35:32,436 WARN  [HiveServer2-Handler-Pool: Thread-42]: service.CompositeService (SessionManager.java:openSession(317)) - Failed to open session
+java.lang.RuntimeException: java.lang.RuntimeException: org.apache.hadoop.ipc.RemoteException(org.apache.hadoop.security.authorize.AuthorizationException): User: hduser is not allowed to impersonate anonymous
+        at org.apache.hive.service.cli.session.HiveSessionProxy.invoke(HiveSessionProxy.java:89) ~[hive-service-2.0.1.jar:2.0.1]
+        at org.apache.hive.service.cli.session.HiveSessionProxy.access$000(HiveSessionProxy.java:36) ~[hive-service-2.0.1.jar:2.0.1]
+        at org.apache.hive.service.cli.session.HiveSessionProxy$1.run(HiveSessionProxy.java:63) ~[hive-service-2.0.1.jar:2.0.1]
+        at java.security.AccessController.doPrivileged(Native Method) ~[?:1.7.0_55]
+        at javax.security.auth.Subject.doAs(Subject.java:415) ~[?:1.7.0_55]
+        at org.apache.hadoop.security.UserGroupInformation.doAs(UserGroupInformation.java:1698) ~[hadoop-common-2.7.3.jar:?]
+        at org.apache.hive.service.cli.session.HiveSessionProxy.invoke(HiveSessionProxy.java:59) ~[hive-service-2.0.1.jar:2.0.1]
+        at com.sun.proxy.$Proxy38.open(Unknown Source) ~[?:?]
+        at org.apache.hive.service.cli.session.SessionManager.openSession(SessionManager.java:315) [hive-service-2.0.1.jar:2.0.1]
+        at org.apache.hive.service.cli.CLIService.openSessionWithImpersonation(CLIService.java:187) [hive-service-2.0.1.jar:2.0.1]
+        at org.apache.hive.service.cli.thrift.ThriftCLIService.getSessionHandle(ThriftCLIService.java:422) [hive-service-2.0.1.jar:2.0.1]
+        at org.apache.hive.service.cli.thrift.ThriftCLIService.OpenSession(ThriftCLIService.java:318) [hive-service-2.0.1.jar:2.0.1]
+        at org.apache.hive.service.cli.thrift.TCLIService$Processor$OpenSession.getResult(TCLIService.java:1257) [hive-service-2.0.1.jar:2.0.1]
+        at org.apache.hive.service.cli.thrift.TCLIService$Processor$OpenSession.getResult(TCLIService.java:1242) [hive-service-2.0.1.jar:2.0.1]
+        at org.apache.thrift.ProcessFunction.process(ProcessFunction.java:39) [hive-exec-2.0.1.jar:2.0.1]
+        at org.apache.thrift.TBaseProcessor.process(TBaseProcessor.java:39) [hive-exec-2.0.1.jar:2.0.1]
+        at org.apache.hive.service.auth.TSetIpAddressProcessor.process(TSetIpAddressProcessor.java:56) [hive-service-2.0.1.jar:2.0.1]
+        at org.apache.thrift.server.TThreadPoolServer$WorkerProcess.run(TThreadPoolServer.java:286) [hive-exec-2.0.1.jar:2.0.1]
+        at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1145) [?:1.7.0_55]
+        at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:615) [?:1.7.0_55]
+        at java.lang.Thread.run(Thread.java:745) [?:1.7.0_55]
+Caused by: java.lang.RuntimeException: org.apache.hadoop.ipc.RemoteException(org.apache.hadoop.security.authorize.AuthorizationException): User: hduser is not allowed to impersonate anonymous
+        at org.apache.hadoop.hive.ql.session.SessionState.start(SessionState.java:576) ~[hive-exec-2.0.1.jar:2.0.1]
+        at org.apache.hadoop.hive.ql.session.SessionState.start(SessionState.java:511) ~[hive-exec-2.0.1.jar:2.0.1]
+        at org.apache.hive.service.cli.session.HiveSessionImpl.open(HiveSessionImpl.java:156) ~[hive-service-2.0.1.jar:2.0.1]
+        at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method) ~[?:1.7.0_55]
+        at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:57) ~[?:1.7.0_55]
+        at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) ~[?:1.7.0_55]
+        at java.lang.reflect.Method.invoke(Method.java:606) ~[?:1.7.0_55]
+        at org.apache.hive.service.cli.session.HiveSessionProxy.invoke(HiveSessionProxy.java:78) ~[hive-service-2.0.1.jar:2.0.1]
+        ... 20 more
+Caused by: org.apache.hadoop.ipc.RemoteException: User: hduser is not allowed to impersonate anonymous
+        at org.apache.hadoop.ipc.Client.call(Client.java:1475) ~[hadoop-common-2.7.3.jar:?]
+        at org.apache.hadoop.ipc.Client.call(Client.java:1412) ~[hadoop-common-2.7.3.jar:?]
+        at org.apache.hadoop.ipc.ProtobufRpcEngine$Invoker.invoke(ProtobufRpcEngine.java:229) ~[hadoop-common-2.7.3.jar:?]
+        at com.sun.proxy.$Proxy34.getFileInfo(Unknown Source) ~[?:?]
+        at org.apache.hadoop.hdfs.protocolPB.ClientNamenodeProtocolTranslatorPB.getFileInfo(ClientNamenodeProtocolTranslatorPB.java:771) ~[hadoop-hdfs-2.7.3.jar:?]
+        at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method) ~[?:1.7.0_55]
+        at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:57) ~[?:1.7.0_55]
+        at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) ~[?:1.7.0_55]
+        at java.lang.reflect.Method.invoke(Method.java:606) ~[?:1.7.0_55]
+        at org.apache.hadoop.io.retry.RetryInvocationHandler.invokeMethod(RetryInvocationHandler.java:191) ~[hadoop-common-2.7.3.jar:?]
+        at org.apache.hadoop.io.retry.RetryInvocationHandler.invoke(RetryInvocationHandler.java:102) ~[hadoop-common-2.7.3.jar:?]
+        at com.sun.proxy.$Proxy35.getFileInfo(Unknown Source) ~[?:?]
+        at org.apache.hadoop.hdfs.DFSClient.getFileInfo(DFSClient.java:2108) ~[hadoop-hdfs-2.7.3.jar:?]
+        at org.apache.hadoop.hdfs.DistributedFileSystem$22.doCall(DistributedFileSystem.java:1305) ~[hadoop-hdfs-2.7.3.jar:?]
+        at org.apache.hadoop.hdfs.DistributedFileSystem$22.doCall(DistributedFileSystem.java:1301) ~[hadoop-hdfs-2.7.3.jar:?]
+        at org.apache.hadoop.fs.FileSystemLinkResolver.resolve(FileSystemLinkResolver.java:81) ~[hadoop-common-2.7.3.jar:?]
+        at org.apache.hadoop.hdfs.DistributedFileSystem.getFileStatus(DistributedFileSystem.java:1301) ~[hadoop-hdfs-2.7.3.jar:?]
+        at org.apache.hadoop.fs.FileSystem.exists(FileSystem.java:1426) ~[hadoop-common-2.7.3.jar:?]
+        at org.apache.hadoop.hive.ql.session.SessionState.createRootHDFSDir(SessionState.java:661) ~[hive-exec-2.0.1.jar:2.0.1]
+        at org.apache.hadoop.hive.ql.session.SessionState.createSessionDirs(SessionState.java:619) ~[hive-exec-2.0.1.jar:2.0.1]
+        at org.apache.hadoop.hive.ql.session.SessionState.start(SessionState.java:548) ~[hive-exec-2.0.1.jar:2.0.1]
+        at org.apache.hadoop.hive.ql.session.SessionState.start(SessionState.java:511) ~[hive-exec-2.0.1.jar:2.0.1]
+        at org.apache.hive.service.cli.session.HiveSessionImpl.open(HiveSessionImpl.java:156) ~[hive-service-2.0.1.jar:2.0.1]
+        at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method) ~[?:1.7.0_55]
+        at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:57) ~[?:1.7.0_55]
+        at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) ~[?:1.7.0_55]
+        at java.lang.reflect.Method.invoke(Method.java:606) ~[?:1.7.0_55]
+        at org.apache.hive.service.cli.session.HiveSessionProxy.invoke(HiveSessionProxy.java:78) ~[hive-service-2.0.1.jar:2.0.1]
+        ... 20 more
+2017-03-04T10:35:32,438 INFO  [HiveServer2-Handler-Pool: Thread-42]: conf.HiveConf (HiveConf.java:getLogIdVar(3177)) - Using the default value passed in for log id: f27e86dd-832d-4e1a-8464-d1f4f0598b85
+2017-03-04T10:35:32,439 INFO  [HiveServer2-Handler-Pool: Thread-42]: session.SessionState (SessionState.java:updateThreadName(406)) - Updating thread name to f27e86dd-832d-4e1a-8464-d1f4f0598b85 HiveServer2-Handler-Pool: Thread-42
+2017-03-04T10:35:32,439 INFO  [f27e86dd-832d-4e1a-8464-d1f4f0598b85 HiveServer2-Handler-Pool: Thread-42]: conf.HiveConf (HiveConf.java:getLogIdVar(3177)) - Using the default value passed in for log id: f27e86dd-832d-4e1a-8464-d1f4f0598b85
+2017-03-04T10:35:32,440 INFO  [f27e86dd-832d-4e1a-8464-d1f4f0598b85 HiveServer2-Handler-Pool: Thread-42]: metastore.HiveMetaStore (HiveMetaStore.java:logInfo(670)) - 2: Shutting down the object store...
+2017-03-04T10:35:32,440 INFO  [f27e86dd-832d-4e1a-8464-d1f4f0598b85 HiveServer2-Handler-Pool: Thread-42]: HiveMetaStore.audit (HiveMetaStore.java:logAuditEvent(280)) - ugi=anonymous   ip=unknown-ip-addr    cmd=Shutting down the object store...
+2017-03-04T10:35:32,440 INFO  [f27e86dd-832d-4e1a-8464-d1f4f0598b85 HiveServer2-Handler-Pool: Thread-42]: metastore.HiveMetaStore (HiveMetaStore.java:logInfo(670)) - 2: Metastore shutdown complete.
+2017-03-04T10:35:32,441 INFO  [f27e86dd-832d-4e1a-8464-d1f4f0598b85 HiveServer2-Handler-Pool: Thread-42]: HiveMetaStore.audit (HiveMetaStore.java:logAuditEvent(280)) - ugi=anonymous   ip=unknown-ip-addr    cmd=Metastore shutdown complete.
+2017-03-04T10:35:32,441 WARN  [f27e86dd-832d-4e1a-8464-d1f4f0598b85 HiveServer2-Handler-Pool: Thread-42]: thrift.ThriftCLIService (ThriftCLIService.java:OpenSession(330)) - Error opening session:
+org.apache.hive.service.cli.HiveSQLException: Failed to open new session: java.lang.RuntimeException: org.apache.hadoop.ipc.RemoteException(org.apache.hadoop.security.authorize.AuthorizationException): User: hduser is not allowed to impersonate anonymous
+        at org.apache.hive.service.cli.session.SessionManager.openSession(SessionManager.java:324) ~[hive-service-2.0.1.jar:2.0.1]
+        at org.apache.hive.service.cli.CLIService.openSessionWithImpersonation(CLIService.java:187) ~[hive-service-2.0.1.jar:2.0.1]
+        at org.apache.hive.service.cli.thrift.ThriftCLIService.getSessionHandle(ThriftCLIService.java:422) ~[hive-service-2.0.1.jar:2.0.1]
+        at org.apache.hive.service.cli.thrift.ThriftCLIService.OpenSession(ThriftCLIService.java:318) [hive-service-2.0.1.jar:2.0.1]
+        at org.apache.hive.service.cli.thrift.TCLIService$Processor$OpenSession.getResult(TCLIService.java:1257) [hive-service-2.0.1.jar:2.0.1]
+        at org.apache.hive.service.cli.thrift.TCLIService$Processor$OpenSession.getResult(TCLIService.java:1242) [hive-service-2.0.1.jar:2.0.1]
+        at org.apache.thrift.ProcessFunction.process(ProcessFunction.java:39) [hive-exec-2.0.1.jar:2.0.1]
+        at org.apache.thrift.TBaseProcessor.process(TBaseProcessor.java:39) [hive-exec-2.0.1.jar:2.0.1]
+        at org.apache.hive.service.auth.TSetIpAddressProcessor.process(TSetIpAddressProcessor.java:56) [hive-service-2.0.1.jar:2.0.1]
+        at org.apache.thrift.server.TThreadPoolServer$WorkerProcess.run(TThreadPoolServer.java:286) [hive-exec-2.0.1.jar:2.0.1]
+        at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1145) [?:1.7.0_55]
+        at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:615) [?:1.7.0_55]
+        at java.lang.Thread.run(Thread.java:745) [?:1.7.0_55]
+Caused by: java.lang.RuntimeException: java.lang.RuntimeException: org.apache.hadoop.ipc.RemoteException(org.apache.hadoop.security.authorize.AuthorizationException): User: hduser is not allowed to impersonate anonymous
+        at org.apache.hive.service.cli.session.HiveSessionProxy.invoke(HiveSessionProxy.java:89) ~[hive-service-2.0.1.jar:2.0.1]
+        at org.apache.hive.service.cli.session.HiveSessionProxy.access$000(HiveSessionProxy.java:36) ~[hive-service-2.0.1.jar:2.0.1]
+        at org.apache.hive.service.cli.session.HiveSessionProxy$1.run(HiveSessionProxy.java:63) ~[hive-service-2.0.1.jar:2.0.1]
+        at java.security.AccessController.doPrivileged(Native Method) ~[?:1.7.0_55]
+        at javax.security.auth.Subject.doAs(Subject.java:415) ~[?:1.7.0_55]
+        at org.apache.hadoop.security.UserGroupInformation.doAs(UserGroupInformation.java:1698) ~[hadoop-common-2.7.3.jar:?]
+        at org.apache.hive.service.cli.session.HiveSessionProxy.invoke(HiveSessionProxy.java:59) ~[hive-service-2.0.1.jar:2.0.1]
+        at com.sun.proxy.$Proxy38.open(Unknown Source) ~[?:?]
+        at org.apache.hive.service.cli.session.SessionManager.openSession(SessionManager.java:315) ~[hive-service-2.0.1.jar:2.0.1]
+        ... 12 more
+Caused by: java.lang.RuntimeException: org.apache.hadoop.ipc.RemoteException(org.apache.hadoop.security.authorize.AuthorizationException): User: hduser is not allowed to impersonate anonymous
+        at org.apache.hadoop.hive.ql.session.SessionState.start(SessionState.java:576) ~[hive-exec-2.0.1.jar:2.0.1]
+        at org.apache.hadoop.hive.ql.session.SessionState.start(SessionState.java:511) ~[hive-exec-2.0.1.jar:2.0.1]
+        at org.apache.hive.service.cli.session.HiveSessionImpl.open(HiveSessionImpl.java:156) ~[hive-service-2.0.1.jar:2.0.1]
+        at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method) ~[?:1.7.0_55]
+        at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:57) ~[?:1.7.0_55]
+        at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) ~[?:1.7.0_55]
+        at java.lang.reflect.Method.invoke(Method.java:606) ~[?:1.7.0_55]
+        at org.apache.hive.service.cli.session.HiveSessionProxy.invoke(HiveSessionProxy.java:78) ~[hive-service-2.0.1.jar:2.0.1]
+        at org.apache.hive.service.cli.session.HiveSessionProxy.access$000(HiveSessionProxy.java:36) ~[hive-service-2.0.1.jar:2.0.1]
+        at org.apache.hive.service.cli.session.HiveSessionProxy$1.run(HiveSessionProxy.java:63) ~[hive-service-2.0.1.jar:2.0.1]
+        at java.security.AccessController.doPrivileged(Native Method) ~[?:1.7.0_55]
+        at javax.security.auth.Subject.doAs(Subject.java:415) ~[?:1.7.0_55]
+        at org.apache.hadoop.security.UserGroupInformation.doAs(UserGroupInformation.java:1698) ~[hadoop-common-2.7.3.jar:?]
+        at org.apache.hive.service.cli.session.HiveSessionProxy.invoke(HiveSessionProxy.java:59) ~[hive-service-2.0.1.jar:2.0.1]
+        at com.sun.proxy.$Proxy38.open(Unknown Source) ~[?:?]
+        at org.apache.hive.service.cli.session.SessionManager.openSession(SessionManager.java:315) ~[hive-service-2.0.1.jar:2.0.1]
+        ... 12 more
+Caused by: org.apache.hadoop.ipc.RemoteException: User: hduser is not allowed to impersonate anonymous
+        at org.apache.hadoop.ipc.Client.call(Client.java:1475) ~[hadoop-common-2.7.3.jar:?]
+        at org.apache.hadoop.ipc.Client.call(Client.java:1412) ~[hadoop-common-2.7.3.jar:?]
+        at org.apache.hadoop.ipc.ProtobufRpcEngine$Invoker.invoke(ProtobufRpcEngine.java:229) ~[hadoop-common-2.7.3.jar:?]
+        at com.sun.proxy.$Proxy34.getFileInfo(Unknown Source) ~[?:?]
+        at org.apache.hadoop.hdfs.protocolPB.ClientNamenodeProtocolTranslatorPB.getFileInfo(ClientNamenodeProtocolTranslatorPB.java:771) ~[hadoop-hdfs-2.7.3.jar:?]
+        at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method) ~[?:1.7.0_55]
+        at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:57) ~[?:1.7.0_55]
+        at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) ~[?:1.7.0_55]
+        at java.lang.reflect.Method.invoke(Method.java:606) ~[?:1.7.0_55]
+        at org.apache.hadoop.io.retry.RetryInvocationHandler.invokeMethod(RetryInvocationHandler.java:191) ~[hadoop-common-2.7.3.jar:?]
+        at org.apache.hadoop.io.retry.RetryInvocationHandler.invoke(RetryInvocationHandler.java:102) ~[hadoop-common-2.7.3.jar:?]
+        at com.sun.proxy.$Proxy35.getFileInfo(Unknown Source) ~[?:?]
+        at org.apache.hadoop.hdfs.DFSClient.getFileInfo(DFSClient.java:2108) ~[hadoop-hdfs-2.7.3.jar:?]
+        at org.apache.hadoop.hdfs.DistributedFileSystem$22.doCall(DistributedFileSystem.java:1305) ~[hadoop-hdfs-2.7.3.jar:?]
+        at org.apache.hadoop.hdfs.DistributedFileSystem$22.doCall(DistributedFileSystem.java:1301) ~[hadoop-hdfs-2.7.3.jar:?]
+        at org.apache.hadoop.fs.FileSystemLinkResolver.resolve(FileSystemLinkResolver.java:81) ~[hadoop-common-2.7.3.jar:?]
+        at org.apache.hadoop.hdfs.DistributedFileSystem.getFileStatus(DistributedFileSystem.java:1301) ~[hadoop-hdfs-2.7.3.jar:?]
+        at org.apache.hadoop.fs.FileSystem.exists(FileSystem.java:1426) ~[hadoop-common-2.7.3.jar:?]
+        at org.apache.hadoop.hive.ql.session.SessionState.createRootHDFSDir(SessionState.java:661) ~[hive-exec-2.0.1.jar:2.0.1]
+        at org.apache.hadoop.hive.ql.session.SessionState.createSessionDirs(SessionState.java:619) ~[hive-exec-2.0.1.jar:2.0.1]
+        at org.apache.hadoop.hive.ql.session.SessionState.start(SessionState.java:548) ~[hive-exec-2.0.1.jar:2.0.1]
+        at org.apache.hadoop.hive.ql.session.SessionState.start(SessionState.java:511) ~[hive-exec-2.0.1.jar:2.0.1]
+        at org.apache.hive.service.cli.session.HiveSessionImpl.open(HiveSessionImpl.java:156) ~[hive-service-2.0.1.jar:2.0.1]
+        at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method) ~[?:1.7.0_55]
+        at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:57) ~[?:1.7.0_55]
+        at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) ~[?:1.7.0_55]
+        at java.lang.reflect.Method.invoke(Method.java:606) ~[?:1.7.0_55]
+        at org.apache.hive.service.cli.session.HiveSessionProxy.invoke(HiveSessionProxy.java:78) ~[hive-service-2.0.1.jar:2.0.1]
+        at org.apache.hive.service.cli.session.HiveSessionProxy.access$000(HiveSessionProxy.java:36) ~[hive-service-2.0.1.jar:2.0.1]
+        at org.apache.hive.service.cli.session.HiveSessionProxy$1.run(HiveSessionProxy.java:63) ~[hive-service-2.0.1.jar:2.0.1]
+        at java.security.AccessController.doPrivileged(Native Method) ~[?:1.7.0_55]
+        at javax.security.auth.Subject.doAs(Subject.java:415) ~[?:1.7.0_55]
+        at org.apache.hadoop.security.UserGroupInformation.doAs(UserGroupInformation.java:1698) ~[hadoop-common-2.7.3.jar:?]
+        at org.apache.hive.service.cli.session.HiveSessionProxy.invoke(HiveSessionProxy.java:59) ~[hive-service-2.0.1.jar:2.0.1]
+        at com.sun.proxy.$Proxy38.open(Unknown Source) ~[?:?]
+        at org.apache.hive.service.cli.session.SessionManager.openSession(SessionManager.java:315) ~[hive-service-2.0.1.jar:2.0.1]
+        ... 12 more
+
+---------------------------------------------------
+
+hduser@cai-hadoop01:/usr/local/hive/bin$ locate core-site.xml
+/usr/local/hadoop-2.7.3/etc/hadoop/core-site.xml
+/usr/local/hadoop-2.7.3/input/core-site.xml
+/usr/local/hadoop-2.7.3/share/hadoop/common/templates/core-site.xml
+hduser@cai-hadoop01:/usr/local/hive/bin$
+
+---------------------------------------------------
+
+ <property>
+    <name>hive.server2.enable.doAs</name>
+    <value>false</value>
+    <description>
+      Setting this property to true will have HiveServer2 execute
+      Hive operations as the user making the calls to it.
+    </description>
+  </property>
+
+---------------------------------------------------
+
+hduser@cai-hadoop01:/usr/local/hive/bin$ ./beeline -u jdbc:hive2://localhost:10000
+ls: cannot access '/usr/local/spark/spark-1.6.3/lib/spark-assembly-*.jar': No such file or directory
+ls: cannot access '/usr/local/hive/lib/hive-jdbc-*-standalone.jar': No such file or directory
+Connecting to jdbc:hive2://localhost:10000
+SLF4J: Class path contains multiple SLF4J bindings.
+SLF4J: Found binding in [jar:file:/usr/local/hive/lib/log4j-slf4j-impl-2.4.1.jar!/org/slf4j/impl/StaticLoggerBinder.class]
+SLF4J: Found binding in [jar:file:/usr/local/hadoop-2.7.3/share/hadoop/common/lib/slf4j-log4j12-1.7.10.jar!/org/slf4j/impl/StaticLoggerBinder.class]
+SLF4J: See http://www.slf4j.org/codes.html#multiple_bindings for an explanation.
+SLF4J: Actual binding is of type [org.apache.logging.slf4j.Log4jLoggerFactory]
+Connected to: Apache Hive (version 2.0.1)
+Driver: Hive JDBC (version 2.0.1)
+17/03/04 10:47:48 [main]: WARN jdbc.HiveConnection: Request to set autoCommit to false; Hive does not support autoCommit=false.
+Transaction isolation: TRANSACTION_REPEATABLE_READ
+Beeline version 2.0.1 by Apache Hive
+0: jdbc:hive2://localhost:10000>
+
+---------------------------------------------------
+
+hduser@cai-hadoop01:/usr/local/hive/bin$ ./beeline -u jdbc:hive2://localhost:10000/metastore -u hduser -p hduser
+ls: cannot access '/usr/local/spark/spark-1.6.3/lib/spark-assembly-*.jar': No such file or directory
+ls: cannot access '/usr/local/hive/lib/hive-jdbc-*-standalone.jar': No such file or directory
+Connecting to jdbc:hive2://localhost:10000/metastore
+SLF4J: Class path contains multiple SLF4J bindings.
+SLF4J: Found binding in [jar:file:/usr/local/hive/lib/log4j-slf4j-impl-2.4.1.jar!/org/slf4j/impl/StaticLoggerBinder.class]
+SLF4J: Found binding in [jar:file:/usr/local/hadoop-2.7.3/share/hadoop/common/lib/slf4j-log4j12-1.7.10.jar!/org/slf4j/impl/StaticLoggerBinder.class]
+SLF4J: See http://www.slf4j.org/codes.html#multiple_bindings for an explanation.
+SLF4J: Actual binding is of type [org.apache.logging.slf4j.Log4jLoggerFactory]
+Connected to: Apache Hive (version 2.0.1)
+Driver: Hive JDBC (version 2.0.1)
+17/03/04 10:49:27 [main]: WARN jdbc.HiveConnection: Request to set autoCommit to false; Hive does not support autoCommit=false.
+Transaction isolation: TRANSACTION_REPEATABLE_READ
+Beeline version 2.0.1 by Apache Hive
+0: jdbc:hive2://localhost:10000/metastore> !tables
++------------+--------------+-------------+-------------+----------+-----------+-------------+------------+----------------------------+-----------------+--+
+| TABLE_CAT  | TABLE_SCHEM  | TABLE_NAME  | TABLE_TYPE  | REMARKS  | TYPE_CAT  | TYPE_SCHEM  | TYPE_NAME  | SELF_REFERENCING_COL_NAME  | REF_GENERATION  |
++------------+--------------+-------------+-------------+----------+-----------+-------------+------------+----------------------------+-----------------+--+
++------------+--------------+-------------+-------------+----------+-----------+-------------+------------+----------------------------+-----------------+--+
+0: jdbc:hive2://localhost:10000/metastore>
+
+
+
+hduser@cai-hadoop01:/usr/local/hive/conf$ grep -A2 hive.server2.enable.doAs hive-site.xml
+    <name>hive.server2.enable.doAs</name>
+    <value>false</value>
+    <description>
+hduser@cai-hadoop01:/usr/local/hive/conf$
+
+---------------------------------------------------
+
+** Tableau **
+
+hduser@cai-hadoop01:/usr/local/hive/bin$ sudo netstat -alpn | grep -i 10000
+[sudo] password for hduser:
+tcp        0      0 0.0.0.0:10000           0.0.0.0:*               LISTEN      8205/java
+tcp        0      0 10.77.84.164:10000      10.76.190.202:58228     ESTABLISHED 8205/java
+tcp        0      0 10.77.84.164:10000      10.76.190.202:58224     ESTABLISHED 8205/java
+hduser@cai-hadoop01:/usr/local/hive/bin$
+
+
+===================================================
+
+## KAFKA ##
+hduser@cai-hadoop01:/usr/local/kafka/kafka_2.11-0.9.0.1$ java -version
+java version "1.8.0_121"
+Java(TM) SE Runtime Environment (build 1.8.0_121-b13)
+Java HotSpot(TM) 64-Bit Server VM (build 25.121-b13, mixed mode)
+
+## Hadoop ##
+hduser@cai-hadoop01:/usr/local/kafka/kafka_2.11-0.9.0.1$ hadoop version
+Hadoop 2.7.3
+Subversion https://git-wip-us.apache.org/repos/asf/hadoop.git -r baa91f7c6bc9cb92be5982de4719c1c8af91ccff
+Compiled by root on 2016-08-18T01:41Z
+Compiled with protoc 2.5.0
+From source with checksum 2e4ce5f957ea4db193bce3734ff29ff4
+This command was run using /usr/local/hadoop-2.7.3/share/hadoop/common/hadoop-common-2.7.3.jar
+hduser@cai-hadoop01:/usr/local/kafka/kafka_2.11-0.9.0.1$
+
+===============================================
+## Starting ZooKeeper ##
+zkServer.sh start
+
+## Starting Kafka ##
+
+hduser@cai-hadoop01:/usr/local/kafka/kafka_2.11-0.9.0.1$ nohup bin/kafka-server-start.sh config/server.properties &
+
+hduser@cai-hadoop01:/usr/local/kafka/kafka_2.11-0.9.0.1$ ps -eaf | grep -i kafka
+hduser   22357 21934  9 12:07 pts/0    00:00:01 /usr/lib/jvm/jdk1.8.0_121/bin/java -Xmx1G -Xms1G -server -XX:+UseG1GC -XX:MaxGCPauseMillis=20 -XX:InitiatingHeapOccupancyPercent=35 -XX:+DisableExplicitGC -Djava.awt.headless=true -Xloggc:/usr/local/kafka/kafka_2.11-0.9.0.1/bin/../logs/kafkaServer-gc.log -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+PrintGCTimeStamps -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dkafka.logs.dir=/usr/local/kafka/kafka_2.11-0.9.0.1/bin/../logs -Dlog4j.configuration=file:bin/../config/log4j.properties -cp :/usr/local/kafka/kafka_2.11-0.9.0.1/bin/../libs/* kafka.Kafka config/server.properties
+hduser   22416 21934  0 12:07 pts/0    00:00:00 grep --color=auto -i kafka
+hduser@cai-hadoop01:/usr/local/kafka/kafka_2.11-0.9.0.1$
+
+===============================================
+## Creating a Topic ##
+
+hduser@cai-hadoop01:/usr/local/kafka/kafka_2.11-0.9.0.1$ kafka-topics.sh --zookeeper localhost:2181 --create --topic MyFirstTopic1 --partitions 2 --replication-factor 1
+Created topic "MyFirstTopic1".
+hduser@cai-hadoop01:/usr/local/kafka/kafka_2.11-0.9.0.1$
+
+## Producer ##
+
+hduser@cai-hadoop01:/usr/local/kafka/kafka_2.11-0.9.0.1$ tty
+/dev/pts/0
+
+
+hduser@cai-hadoop01:/usr/local/kafka/kafka_2.11-0.9.0.1$ kafka-console-producer.sh --broker-list localhost:9092 --topic MyFirstTopic
+message 1, Hello World
+[2017-05-01 12:19:40,407] WARN Error while fetching metadata with correlation id 1 : {MyFirstTopic=LEADER_NOT_AVAILABLE} (org.apache.kafka.clients.NetworkClient)
+message 2, Testing .. Testing
+
+
+
+## Consumer ##
+
+hduser@cai-hadoop01:~$ kafka-console-consumer.sh --bootstrap-server  localhost:9092 --topic MyFirstTopic --zookeeper localhost
+message 1, Hello World
+message 2, Testing .. Testing
+
+
+hduser@cai-hadoop01:~$ tty
+/dev/pts/1
+hduser@cai-hadoop01:~$
